@@ -1,5 +1,6 @@
 import { renderCharacter, renderBattle, EXPRESSIONS, POSES, CHARACTERS } from "./character.js";
 import { renderStoryFrame, STORY, STORY_DURATION, storySceneAt } from "./story.js";
+import { renderVillageFrame, VILLAGE_STORY, VILLAGE_DURATION, villageSceneAt } from "./villageStory.js";
 import { sfx, setSoundEnabled, isSoundEnabled } from "./sound.js";
 
 // Timeline demo: 5 cảnh, tổng 16 giây.
@@ -29,6 +30,9 @@ const state = {
   storyPlaying: false,
   storyStartAt: 0,
   storyLastScene: -1,
+  villagePlaying: false,
+  villageStartAt: 0,
+  villageLastScene: -1,
 };
 
 const $ = (id) => document.getElementById(id);
@@ -84,6 +88,39 @@ function renderStory(t) {
 // ${scene.sub}`;
   document.querySelectorAll("[data-story-scene]").forEach(b =>
     b.classList.toggle("active", Number(b.dataset.storyScene) === index));
+}
+
+function renderVillage(t) {
+  stage.innerHTML = renderVillageFrame(t);
+  const { scene, index } = villageSceneAt(t);
+  $("stage-title").textContent = `🏡 ${scene.title}`;
+  $("stage-badge").textContent = "CHUYỆN LÀNG QUÊ • 90 GIÂY";
+  $("story-sub").textContent = `“${scene.dialogue}” — ${scene.sub}`;
+  $("time-label").textContent = `Phim làng quê: ${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, "0")} / 1:30 — Cảnh ${index + 1}/6: ${scene.title}`;
+  codeView.textContent =
+`renderVillageFrame(${t.toFixed(1)})
+// Cảnh ${scene.id}/6: ${scene.title}
+// ${scene.sub}`;
+  document.querySelectorAll("[data-village-scene]").forEach(b =>
+    b.classList.toggle("active", Number(b.dataset.villageScene) === index));
+}
+
+function villageTick() {
+  if (!state.villagePlaying) return;
+  const elapsed = (performance.now() - state.villageStartAt) / 1000;
+  if (elapsed >= VILLAGE_DURATION) {
+    state.villagePlaying = false;
+    $("village-btn").textContent = "▶ Xem lại phim làng quê 90s";
+    sfx.cheer();
+    return;
+  }
+  const { index } = villageSceneAt(elapsed);
+  if (index !== state.villageLastScene) {
+    state.villageLastScene = index;
+    if (index === 3) sfx.pop(); else sfx.jump();
+  }
+  renderVillage(elapsed);
+  requestAnimationFrame(villageTick);
 }
 
 function storyTick() {
@@ -146,6 +183,47 @@ function tick() {
   requestAnimationFrame(tick);
 }
 
+$("village-btn").onclick = () => {
+  state.playing = false; state.storyPlaying = false; state.mode = "village"; state.villagePlaying = true; state.villageLastScene = -1;
+  state.villageStartAt = performance.now();
+  $("village-btn").textContent = "⏸ Đang chiếu phim làng quê…";
+  $("story-btn").textContent = "🎬 Xem phim 60s: Đi câu cá";
+  requestAnimationFrame(villageTick);
+};
+$("export-village").onclick = async () => {
+  const btn = $("export-village");
+  btn.disabled = true; btn.textContent = "Đang ghi phim 90s… đừng tắt tab";
+  try {
+    const canvas = document.createElement("canvas");
+    canvas.width = 960; canvas.height = 540;
+    const ctx = canvas.getContext("2d");
+    const stream = canvas.captureStream(30);
+    const rec = new MediaRecorder(stream, { mimeType: "video/webm" });
+    const chunks = [];
+    rec.ondataavailable = (e) => chunks.push(e.data);
+    const done = new Promise((res) => (rec.onstop = res));
+    rec.start();
+    const t0 = performance.now();
+    const draw = () => {
+      const elapsed = (performance.now() - t0) / 1000;
+      if (elapsed >= VILLAGE_DURATION) { rec.stop(); return; }
+      const svg = renderVillageFrame(elapsed);
+      const img = new Image();
+      img.onload = () => { ctx.drawImage(img, 0, 0, 960, 540); requestAnimationFrame(draw); };
+      img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+    };
+    draw();
+    await done;
+    const blob = new Blob(chunks, { type: "video/webm" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob); a.download = "chuyen-lang-que.webm"; a.click();
+    URL.revokeObjectURL(a.href);
+  } catch (err) {
+    alert("Trình duyệt này không hỗ trợ ghi video WebM. Hãy dùng Chrome mới nhất.");
+  } finally {
+    btn.disabled = false; btn.textContent = "⬇ Xuất phim làng quê 90s (WebM)";
+  }
+};
 $("story-btn").onclick = () => {
   state.playing = false; state.mode = "story"; state.storyPlaying = true; state.storyLastScene = -1;
   state.storyStartAt = performance.now();
@@ -256,6 +334,16 @@ $("export-video").onclick = async () => {
   }
 };
 
+VILLAGE_STORY.forEach((sc, i) => {
+  const b = document.createElement("button");
+  b.textContent = `Làng ${sc.id}: ${sc.title}`;
+  b.dataset.villageScene = i;
+  b.onclick = () => {
+    state.playing = false; state.storyPlaying = false; state.villagePlaying = false; state.mode = "village";
+    renderVillage(i * 15 + 1);
+  };
+  $("village-scenes").appendChild(b);
+});
 buildButtons();
 STORY.forEach((sc, i) => {
   const b = document.createElement("button");

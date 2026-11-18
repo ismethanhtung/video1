@@ -11,7 +11,7 @@ Claude tự viết code để vẽ, người chỉ xem và chê.
 - 6 tư thế: vẫy tay, nhảy lên, chỉ tay, giơ hai tay, cúi chào, đứng yên
 - Timeline 5 cảnh, tổng 16 giây, tự chạy (cảnh cuối là đánh nhau)
 - Đổi màu áo, màu nền, chữ trên màn hình, bật mưa giấy màu
-- **v3 — Phim dài 60 giây "Đi câu cá":** 6 cảnh, mỗi cảnh 10 giây: 1) Sáng sớm ở nhà, 2) Đi trên đường làng, cây rung lá rụng, 3) Gặp cô bé dưới gốc cây, nói chuyện, 4) Ra bờ sông câu cá, nước lăn tăn, cá nhảy, 5) Câu được cá to lúc chiều xuống, 6) Về nhà lúc hoàng hôn. Có trời xanh mây trắng trôi, mặt trời, chim bay, nhà, cây, chó Vàng chạy theo, bong bóng thoại, phụ đề từng cảnh, âm thanh theo cảnh, nút chọn từng cảnh và nút xuất phim 60s (WebM). Code ở `src/story.js` + `src/scenery.js`.
+- **v4 — Phim "Chuyện làng quê" 90 giây:** đúng phong cách ảnh bạn gửi — 3 căn nhà lá, cây dừa, trời chiều vàng cam, Má (áo tím, tóc búi), Anh Hai (áo xanh), Tôi (áo sọc đỏ trắng), chó vàng, nhãn tên trong hộp trắng, phụ đề đen chữ trắng lớn. 6 cảnh × 15 giây: chiều ở xóm, Má chèo xuồng bán chè đậu, đi dọc bờ rạch, điều kiêng của xóm ở khúc sông, sáng hôm sau, về nhà lúc hoàng hôn. Code ở `src/village.js` + `src/villageStory.js`.
 - Panel "Code đang chạy" cập nhật theo tham số bạn chọn
 - Xuất video WebM (ghi theo thời gian thực 12s, dùng Chrome), tải SVG
 
