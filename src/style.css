@@ -9,6 +9,9 @@ main { max-width: 980px; margin: 0 auto; padding: 16px 20px 40px; display: grid;
 .stage-wrap .badge { position: absolute; top: 14px; left: 50%; transform: translateX(-50%); background: #d98a68; color: #fff; padding: 6px 12px; border-radius: 999px; font-weight: 700; letter-spacing: 1px; font-size: 12px; }
 .stage-wrap h2 { margin: 52px 0 0; font-size: 34px; }
 #stage svg { width: 300px; height: auto; display: block; margin: 8px auto; }
+#stage.battle svg { width: 560px; max-width: 100%; }
+#stage.battle { animation: shake 0.4s infinite; }
+@keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-3px); } 75% { transform: translateX(3px); } }
 #stage.confetti::after { content: "🎉 ✨ 🎊 ✨ 🎉"; position: absolute; top: 70px; left: 0; right: 0; font-size: 28px; }
 .controls { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
 .controls button, .row button { padding: 9px 13px; border-radius: 999px; border: 1px solid #ddd; background: #fff; cursor: pointer; font-size: 14px; }

@@ -9,8 +9,9 @@ Claude tự viết code để vẽ, người chỉ xem và chê.
 - Cậu bé áo vàng, đeo kính — vẽ bằng `src/character.js`
 - 6 biểu cảm: vui, cười lớn, ngạc nhiên, buồn, nháy mắt, mắt tim
 - 6 tư thế: vẫy tay, nhảy lên, chỉ tay, giơ hai tay, cúi chào, đứng yên
-- Timeline 4 cảnh, tổng 12 giây, tự chạy
+- Timeline 5 cảnh, tổng 16 giây, tự chạy (cảnh cuối là đánh nhau)
 - Đổi màu áo, màu nền, chữ trên màn hình, bật mưa giấy màu
+- **v2:** thêm nhân vật thứ 2 — cô bé áo xanh (tóc dài, không đeo kính), tư thế Đấm, cảnh đánh nhau 2 người với sao va chạm và rung màn hình, âm thanh tổng hợp bằng Web Audio (pop / nhảy / đấm / reo hò), nút bật-tắt âm thanh
 - Panel "Code đang chạy" cập nhật theo tham số bạn chọn
 - Xuất video WebM (ghi theo thời gian thực 12s, dùng Chrome), tải SVG
 
