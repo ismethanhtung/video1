@@ -89,7 +89,7 @@ function hairSVG(style, color) {
   return `<path d="M92 138 Q88 82 150 80 Q212 82 208 138 Q196 106 178 104 Q186 92 172 88 Q168 100 150 96 Q132 100 128 88 Q114 92 122 104 Q104 106 92 138z" fill="${color}"/>`;
 }
 
-function innerCharacter({ expression = "vui", pose = "vay-tay", shirt = "#f2b234", skin = "#ffe0bd", hair = "#222222", hairStyle = "spiky", glasses = true } = {}) {
+export function innerCharacter({ expression = "vui", pose = "vay-tay", shirt = "#f2b234", skin = "#ffe0bd", hair = "#222222", hairStyle = "spiky", glasses = true } = {}) {
   const exp = EXPRESSIONS[expression] || EXPRESSIONS["vui"];
   const p = POSES[pose] || POSES["vay-tay"];
   const bow = p.bow || 0;

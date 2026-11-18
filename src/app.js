@@ -1,4 +1,5 @@
 import { renderCharacter, renderBattle, EXPRESSIONS, POSES, CHARACTERS } from "./character.js";
+import { renderStoryFrame, STORY, STORY_DURATION, storySceneAt } from "./story.js";
 import { sfx, setSoundEnabled, isSoundEnabled } from "./sound.js";
 
 // Timeline demo: 5 cảnh, tổng 16 giây.
@@ -21,10 +22,13 @@ const state = {
   confetti: false,
   battle: false,
   title: "Làm chủ Claude",
-  mode: "timeline", // timeline | free
+  mode: "timeline", // timeline | free | story
   playing: false,
   startAt: 0,
   lastScene: -1,
+  storyPlaying: false,
+  storyStartAt: 0,
+  storyLastScene: -1,
 };
 
 const $ = (id) => document.getElementById(id);
@@ -65,6 +69,39 @@ function render() {
     b.classList.toggle("active", b.dataset.pose === state.pose));
   document.querySelectorAll("[data-character]").forEach(b =>
     b.classList.toggle("active", b.dataset.character === state.character));
+}
+
+function renderStory(t) {
+  stage.innerHTML = renderStoryFrame(t);
+  const { scene, index } = storySceneAt(t);
+  $("stage-title").textContent = `🎬 ${scene.title}`;
+  $("stage-badge").textContent = "PHIM 60 GIÂY";
+  $("story-sub").textContent = `“${scene.dialogue}” — ${scene.sub}`;
+  $("time-label").textContent = `Phim: 0:${String(Math.floor(t)).padStart(2, "0")} / 1:00 — Cảnh ${index + 1}/6: ${scene.title}`;
+  codeView.textContent =
+`renderStoryFrame(${t.toFixed(1)})
+// Cảnh ${scene.id}/6: ${scene.title}
+// ${scene.sub}`;
+  document.querySelectorAll("[data-story-scene]").forEach(b =>
+    b.classList.toggle("active", Number(b.dataset.storyScene) === index));
+}
+
+function storyTick() {
+  if (!state.storyPlaying) return;
+  const elapsed = (performance.now() - state.storyStartAt) / 1000;
+  if (elapsed >= STORY_DURATION) {
+    state.storyPlaying = false;
+    $("story-btn").textContent = "▶ Xem lại phim 60s";
+    sfx.cheer();
+    return;
+  }
+  const { index } = storySceneAt(elapsed);
+  if (index !== state.storyLastScene) {
+    state.storyLastScene = index;
+    if (index === 3) sfx.pop(); else if (index === 4) sfx.cheer(); else sfx.jump();
+  }
+  renderStory(elapsed);
+  requestAnimationFrame(storyTick);
 }
 
 function buildButtons() {
@@ -109,6 +146,47 @@ function tick() {
   requestAnimationFrame(tick);
 }
 
+$("story-btn").onclick = () => {
+  state.playing = false; state.mode = "story"; state.storyPlaying = true; state.storyLastScene = -1;
+  state.storyStartAt = performance.now();
+  $("story-btn").textContent = "⏸ Đang chiếu phim…";
+  $("play-btn").textContent = "▶ Phát timeline 16s";
+  requestAnimationFrame(storyTick);
+};
+$("export-story").onclick = async () => {
+  const btn = $("export-story");
+  btn.disabled = true; btn.textContent = "Đang ghi phim 60s… đừng tắt tab";
+  try {
+    const canvas = document.createElement("canvas");
+    canvas.width = 960; canvas.height = 540;
+    const ctx = canvas.getContext("2d");
+    const stream = canvas.captureStream(30);
+    const rec = new MediaRecorder(stream, { mimeType: "video/webm" });
+    const chunks = [];
+    rec.ondataavailable = (e) => chunks.push(e.data);
+    const done = new Promise((res) => (rec.onstop = res));
+    rec.start();
+    const t0 = performance.now();
+    const draw = () => {
+      const elapsed = (performance.now() - t0) / 1000;
+      if (elapsed >= STORY_DURATION) { rec.stop(); return; }
+      const svg = renderStoryFrame(elapsed);
+      const img = new Image();
+      img.onload = () => { ctx.drawImage(img, 0, 0, 960, 540); requestAnimationFrame(draw); };
+      img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+    };
+    draw();
+    await done;
+    const blob = new Blob(chunks, { type: "video/webm" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob); a.download = "phim-di-cau-ca.webm"; a.click();
+    URL.revokeObjectURL(a.href);
+  } catch (err) {
+    alert("Trình duyệt này không hỗ trợ ghi video WebM. Hãy dùng Chrome mới nhất.");
+  } finally {
+    btn.disabled = false; btn.textContent = "⬇ Xuất phim 60s (WebM)";
+  }
+};
 $("play-btn").onclick = () => {
   state.mode = "timeline"; state.playing = true; state.lastScene = -1;
   state.startAt = performance.now();
@@ -179,4 +257,14 @@ $("export-video").onclick = async () => {
 };
 
 buildButtons();
+STORY.forEach((sc, i) => {
+  const b = document.createElement("button");
+  b.textContent = `Cảnh ${sc.id}: ${sc.title}`;
+  b.dataset.storyScene = i;
+  b.onclick = () => {
+    state.playing = false; state.storyPlaying = false; state.mode = "story";
+    renderStory(i * 10 + 1);
+  };
+  $("story-scenes").appendChild(b);
+});
 render();
