@@ -1,0 +1,23 @@
+* { box-sizing: border-box; }
+body { margin: 0; font-family: system-ui, -apple-system, sans-serif; background: #f6f3ee; color: #1c1a17; }
+header { padding: 28px 20px 8px; max-width: 980px; margin: 0 auto; }
+header h1 { margin: 0 0 6px; font-size: 28px; }
+header p { margin: 0; color: #666; }
+main { max-width: 980px; margin: 0 auto; padding: 16px 20px 40px; display: grid; gap: 16px; }
+.card { background: #fff; border: 1px solid #e6e0d6; border-radius: 16px; padding: 16px; }
+.stage-wrap { position: relative; background: #faf7f2; border-radius: 12px; overflow: hidden; text-align: center; min-height: 420px; }
+.stage-wrap .badge { position: absolute; top: 14px; left: 50%; transform: translateX(-50%); background: #d98a68; color: #fff; padding: 6px 12px; border-radius: 999px; font-weight: 700; letter-spacing: 1px; font-size: 12px; }
+.stage-wrap h2 { margin: 52px 0 0; font-size: 34px; }
+#stage svg { width: 300px; height: auto; display: block; margin: 8px auto; }
+#stage.confetti::after { content: "🎉 ✨ 🎊 ✨ 🎉"; position: absolute; top: 70px; left: 0; right: 0; font-size: 28px; }
+.controls { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.controls button, .row button { padding: 9px 13px; border-radius: 999px; border: 1px solid #ddd; background: #fff; cursor: pointer; font-size: 14px; }
+.controls button.active { background: #1c1a17; color: #fff; border-color: #1c1a17; }
+.controls button:disabled { opacity: .6; cursor: wait; }
+.row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-top: 12px; }
+.row label { font-size: 14px; color: #555; display: flex; gap: 6px; align-items: center; }
+.row input[type="text"] { padding: 8px 10px; border: 1px solid #ddd; border-radius: 8px; min-width: 220px; }
+h3 { margin: 18px 0 8px; font-size: 16px; }
+pre { background: #171412; color: #d7f0c2; padding: 14px; border-radius: 12px; overflow: auto; font-size: 13px; }
+#time-label { color: #666; font-size: 13px; margin-top: 8px; }
+ol, ul { line-height: 1.7; }

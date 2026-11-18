@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Làm video bằng code — Demo</title>
+  <link rel="stylesheet" href="src/style.css" />
+</head>
+<body>
+  <header>
+    <h1>Làm video bằng code — Demo</h1>
+    <p>Nhân vật vẽ 100% bằng SVG/code, không dùng file ảnh. Đổi tham số → hình đổi, code đổi theo.</p>
+  </header>
+  <main>
+    <section class="card">
+      <div class="stage-wrap">
+        <div class="badge" id="stage-badge">SERIES MỚI</div>
+        <h2 id="stage-title">Làm chủ Claude</h2>
+        <div id="stage"></div>
+      </div>
+      <div id="time-label">0:00 / 0:12 — Bấm phát để chạy timeline 4 cảnh</div>
+      <div class="row">
+        <button id="play-btn">▶ Phát timeline 12s</button>
+        <button id="free-btn">Chế độ tự do</button>
+        <button id="confetti-btn">🎉 Mưa giấy màu</button>
+        <button id="export-video">⬇ Xuất video WebM (12s)</button>
+        <button id="download-svg">⬇ Tải SVG</button>
+      </div>
+      <h3>6 biểu cảm</h3>
+      <div class="controls" id="expressions"></div>
+      <h3>6 tư thế</h3>
+      <div class="controls" id="poses"></div>
+      <div class="row">
+        <label>Màu áo <input type="color" id="shirt-color" value="#f2b234" /></label>
+        <label>Màu nền <input type="color" id="bg-color" value="#faf7f2" /></label>
+        <label>Chữ trên màn hình <input type="text" id="title-input" value="Làm chủ Claude" /></label>
+      </div>
+    </section>
+
+    <section class="card">
+      <h3>Code đang chạy</h3>
+      <pre id="code-view"></pre>
+      <p>Muốn thêm nhân vật mới? Chỉ cần thêm một hàm <code>renderCharacter()</code> khác với cùng bộ tham số — mặt, áo, tỉ lệ sẽ giữ nguyên qua mọi cảnh, giống cách làm trong video gốc.</p>
+    </section>
+
+    <section class="card">
+      <h3>Làm việc chung như thế nào?</h3>
+      <ol>
+        <li>Bạn tạo repo trống trên GitHub, rồi push folder này lên (xem <code>docs/PUSH_TO_GITHUB.md</code>).</li>
+        <li>Mình clone repo về, code trên branch riêng, push lên để bạn review.</li>
+        <li>Chạy demo: mở <code>index.html</code> bằng trình duyệt, hoặc <code>npx serve .</code></li>
+      </ol>
+    </section>
+  </main>
+  <script type="module" src="src/app.js"></script>
+</body>
+</html>
