@@ -3,7 +3,7 @@ import { renderStoryFrame, STORY, STORY_DURATION, storySceneAt } from "./story.j
 import { renderVillageFrame, VILLAGE_STORY, VILLAGE_DURATION, villageSceneAt } from "./villageStory.js";
 import { renderDoraemonFrame, DORAEMON_STORY, DORAEMON_DURATION, doraemonSceneAt } from "./doraemonStory.js";
 import { renderDesertFrame, DESERT_STORY, DESERT_DURATION, desertSceneAt } from "./desertStory.js";
-import { renderCoffeeFrame, COFFEE_FRAMES, COFFEE_FRAME_COUNT } from "./coffeeStory.js";
+import { renderCoffeeFrame, COFFEE_SCENES, COFFEE_DURATION, coffeeSceneAt } from "./coffeeStory.js";
 import { sfx, setSoundEnabled, isSoundEnabled } from "./sound.js";
 
 // Timeline demo: 5 cảnh, tổng 16 giây.
@@ -43,6 +43,9 @@ const state = {
   desertStartAt: 0,
   desertLastScene: -1,
   coffeeIndex: 0,
+  coffeePlaying: false,
+  coffeeStartAt: 0,
+  coffeeLastScene: -1,
 };
 
 const $ = (id) => document.getElementById(id);
@@ -103,17 +106,37 @@ function renderStory(t) {
 function renderCoffee(i) {
   state.coffeeIndex = i;
   stage.innerHTML = renderCoffeeFrame(i);
-  const f = COFFEE_FRAMES[i];
+  const f = COFFEE_SCENES[i];
   $("stage-title").textContent = `☕ ${f.title}`;
-  $("stage-badge").textContent = "CÀ PHÊ • VẼ TAY • ẢNH TĨNH";
+  $("stage-badge").textContent = "CÀ PHÊ • VẼ TAY • 5 PHÚT";
   $("story-sub").textContent = f.sub;
-  $("time-label").textContent = `Tranh cà phê: khung ${i + 1}/${COFFEE_FRAME_COUNT} — ${f.title}`;
+  $("time-label").textContent = `Video cà phê: cảnh ${i + 1}/${COFFEE_SCENES.length} — ${f.title} (mỗi cảnh 10 giây)`;
   codeView.textContent =
 `renderCoffeeFrame(${i})
-// Khung ${f.id}/${COFFEE_FRAME_COUNT}: ${f.title}
+// Cảnh ${f.id}/30: ${f.title}
 // ${f.sub}`;
   document.querySelectorAll("[data-coffee-frame]").forEach(b =>
     b.classList.toggle("active", Number(b.dataset.coffeeFrame) === i));
+}
+
+function coffeeTick() {
+  if (!state.coffeePlaying) return;
+  const elapsed = (performance.now() - state.coffeeStartAt) / 1000;
+  if (elapsed >= COFFEE_DURATION) {
+    state.coffeePlaying = false;
+    $("coffee-play-btn").textContent = "▶ Xem lại video cà phê 5 phút";
+    sfx.cheer();
+    return;
+  }
+  const { index } = coffeeSceneAt(elapsed);
+  if (index !== state.coffeeLastScene) {
+    state.coffeeLastScene = index;
+    renderCoffee(index);
+    if (index % 5 === 0) sfx.pop();
+  }
+  const mm = String(Math.floor(elapsed / 60)).padStart(1, "0"), ss = String(Math.floor(elapsed % 60)).padStart(2, "0");
+  $("time-label").textContent = `Video cà phê: ${mm}:${ss} / 5:00 — cảnh ${index + 1}/30: ${COFFEE_SCENES[index].title}`;
+  requestAnimationFrame(coffeeTick);
 }
 
 function renderDesert(t) {
@@ -276,11 +299,51 @@ function tick() {
 }
 
 $("coffee-btn").onclick = () => {
-  state.playing = false; state.storyPlaying = false; state.villagePlaying = false; state.doraemonPlaying = false; state.desertPlaying = false; state.mode = "coffee";
+  state.playing = false; state.storyPlaying = false; state.villagePlaying = false; state.doraemonPlaying = false; state.desertPlaying = false; state.coffeePlaying = false; state.mode = "coffee";
   renderCoffee(state.coffeeIndex);
 };
+$("coffee-play-btn").onclick = () => {
+  state.playing = false; state.storyPlaying = false; state.villagePlaying = false; state.doraemonPlaying = false; state.desertPlaying = false; state.mode = "coffee"; state.coffeePlaying = true; state.coffeeLastScene = -1;
+  state.coffeeStartAt = performance.now();
+  $("coffee-play-btn").textContent = "⏸ Đang chiếu video cà phê 5 phút…";
+  requestAnimationFrame(coffeeTick);
+};
+$("export-coffee").onclick = async () => {
+  const btn = $("export-coffee");
+  btn.disabled = true; btn.textContent = "Đang ghi video 5 phút… đừng tắt tab";
+  try {
+    const canvas = document.createElement("canvas");
+    canvas.width = 960; canvas.height = 540;
+    const ctx = canvas.getContext("2d");
+    const stream = canvas.captureStream(30);
+    const rec = new MediaRecorder(stream, { mimeType: "video/webm" });
+    const chunks = [];
+    rec.ondataavailable = (e) => chunks.push(e.data);
+    const done = new Promise((res) => (rec.onstop = res));
+    rec.start();
+    const t0 = performance.now();
+    const draw = () => {
+      const elapsed = (performance.now() - t0) / 1000;
+      if (elapsed >= COFFEE_DURATION) { rec.stop(); return; }
+      const svg = renderCoffeeFrame(coffeeSceneAt(elapsed).index);
+      const img = new Image();
+      img.onload = () => { ctx.drawImage(img, 0, 0, 960, 540); requestAnimationFrame(draw); };
+      img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+    };
+    draw();
+    await done;
+    const blob = new Blob(chunks, { type: "video/webm" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob); a.download = "ca-phe-5-phut.webm"; a.click();
+    URL.revokeObjectURL(a.href);
+  } catch (err) {
+    alert("Trình duyệt này không hỗ trợ ghi video WebM. Hãy dùng Chrome mới nhất.");
+  } finally {
+    btn.disabled = false; btn.textContent = "⬇ Xuất video cà phê 5 phút (WebM)";
+  }
+};
 $("desert-btn").onclick = () => {
-  state.playing = false; state.storyPlaying = false; state.villagePlaying = false; state.doraemonPlaying = false; state.mode = "desert"; state.desertPlaying = true; state.desertLastScene = -1;
+  state.playing = false; state.storyPlaying = false; state.villagePlaying = false; state.doraemonPlaying = false; state.coffeePlaying = false; state.mode = "desert"; state.desertPlaying = true; state.desertLastScene = -1;
   state.desertStartAt = performance.now();
   $("desert-btn").textContent = "⏸ Đang chiếu phim sa mạc…";
   $("story-btn").textContent = "🎬 Xem phim 60s: Đi câu cá";
@@ -323,7 +386,7 @@ $("export-desert").onclick = async () => {
   }
 };
 $("doraemon-btn").onclick = () => {
-  state.playing = false; state.storyPlaying = false; state.villagePlaying = false; state.desertPlaying = false; state.mode = "doraemon"; state.doraemonPlaying = true; state.doraemonLastScene = -1;
+  state.playing = false; state.storyPlaying = false; state.villagePlaying = false; state.desertPlaying = false; state.coffeePlaying = false; state.mode = "doraemon"; state.doraemonPlaying = true; state.doraemonLastScene = -1;
   state.doraemonStartAt = performance.now();
   $("doraemon-btn").textContent = "⏸ Đang chiếu phim Doraemon…";
   $("story-btn").textContent = "🎬 Xem phim 60s: Đi câu cá";
@@ -365,7 +428,7 @@ $("export-doraemon").onclick = async () => {
   }
 };
 $("village-btn").onclick = () => {
-  state.playing = false; state.storyPlaying = false; state.doraemonPlaying = false; state.desertPlaying = false; state.mode = "village"; state.villagePlaying = true; state.villageLastScene = -1;
+  state.playing = false; state.storyPlaying = false; state.doraemonPlaying = false; state.desertPlaying = false; state.coffeePlaying = false; state.mode = "village"; state.villagePlaying = true; state.villageLastScene = -1;
   state.villageStartAt = performance.now();
   $("village-btn").textContent = "⏸ Đang chiếu phim làng quê…";
   $("story-btn").textContent = "🎬 Xem phim 60s: Đi câu cá";
@@ -406,7 +469,7 @@ $("export-village").onclick = async () => {
   }
 };
 $("story-btn").onclick = () => {
-  state.playing = false; state.villagePlaying = false; state.doraemonPlaying = false; state.desertPlaying = false; state.mode = "story"; state.storyPlaying = true; state.storyLastScene = -1;
+  state.playing = false; state.villagePlaying = false; state.doraemonPlaying = false; state.desertPlaying = false; state.coffeePlaying = false; state.mode = "story"; state.storyPlaying = true; state.storyLastScene = -1;
   state.storyStartAt = performance.now();
   $("story-btn").textContent = "⏸ Đang chiếu phim…";
   $("play-btn").textContent = "▶ Phát timeline 16s";
@@ -545,12 +608,12 @@ DESERT_STORY.forEach((sc, i) => {
   };
   $("desert-scenes").appendChild(b);
 });
-COFFEE_FRAMES.forEach((f, i) => {
+COFFEE_SCENES.forEach((f, i) => {
   const b = document.createElement("button");
   b.textContent = `Cà phê ${f.id}: ${f.title}`;
   b.dataset.coffeeFrame = i;
   b.onclick = () => {
-    state.playing = false; state.storyPlaying = false; state.villagePlaying = false; state.doraemonPlaying = false; state.desertPlaying = false; state.mode = "coffee";
+    state.playing = false; state.storyPlaying = false; state.villagePlaying = false; state.doraemonPlaying = false; state.desertPlaying = false; state.coffeePlaying = false; state.mode = "coffee";
     renderCoffee(i);
   };
   $("coffee-scenes").appendChild(b);

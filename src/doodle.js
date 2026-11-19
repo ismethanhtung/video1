@@ -126,6 +126,7 @@ export function blobCharSVG(cx, feetY, opts = {}) {
     ${shadowSVG(cx, feetY + 2, r * 0.95)}
     <path d="${blobPath(cx, cy, r, r * 0.96, seed)}" fill="${color}" stroke="${INK}" stroke-width="6" stroke-linejoin="round"/>
     <path d="M${cx - r + 8} ${cy + r * 0.55} q10 14 4 26 M${cx + r - 8} ${cy + r * 0.55} q-10 14 -4 26" fill="none" stroke="${INK}" stroke-width="5" stroke-linecap="round"/>
+    ${opts.wave ? `<path d="M${cx + r - 12} ${cy + r * 0.4} q28 -4 24 -38" fill="none" stroke="${INK}" stroke-width="5" stroke-linecap="round"/><circle cx="${cx + r + 12}" cy="${cy + r * 0.4 - 38}" r="9" fill="${color}" stroke="${INK}" stroke-width="4"/>` : ""}
     ${faceSVG(cx, cy, 1, face)}
     ${blushDots(cx, cy, 1)}
     ${prop ? props[prop] || "" : ""}
@@ -196,5 +197,207 @@ export function phinSVG(cx, feetY, s = 1) {
     <path d="M-30 -58 L30 -58" stroke="${INK}" stroke-width="3" opacity="0.5"/>
     <path d="M0 -4 q3 8 0 14" fill="none" stroke="#6b4226" stroke-width="4" stroke-linecap="round"/>
     <circle cx="0" cy="14" r="4" fill="#6b4226"/>
+  </g>`;
+}
+
+// ---- Dùng chung cho mọi khung hình ----
+
+export function panelSVG(x, y, w, h) {
+  return `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#fff" stroke="${INK}" stroke-width="6" stroke-linejoin="round"/>`;
+}
+export function panelLabel(x, y, text, size = 26, anchor = "middle") {
+  return `<text x="${x}" y="${y}" text-anchor="${anchor}" font-family="Arial, Helvetica, sans-serif" font-size="${size}" font-weight="800" fill="${INK}">${text}</text>`;
+}
+export function doodleSun(cx, cy, r = 55) {
+  let rays = "";
+  for (let i = 0; i < 8; i++) {
+    const a = (i / 8) * Math.PI * 2;
+    const x1 = cx + Math.cos(a) * (r + 8), y1 = cy + Math.sin(a) * (r + 8);
+    const x2 = cx + Math.cos(a) * (r + 26), y2 = cy + Math.sin(a) * (r + 26);
+    rays += `<line x1="${x1.toFixed(0)}" y1="${y1.toFixed(0)}" x2="${x2.toFixed(0)}" y2="${y2.toFixed(0)}" stroke="${INK}" stroke-width="6" stroke-linecap="round"/>`;
+  }
+  return `<g>${rays}<circle cx="${cx}" cy="${cy}" r="${r}" fill="#f2c94c" stroke="${INK}" stroke-width="6"/><circle cx="${cx - 18}" cy="${cy - 8}" r="5" fill="${INK}"/><circle cx="${cx + 18}" cy="${cy - 8}" r="5" fill="${INK}"/><path d="M${cx - 16} ${cy + 14} Q${cx} ${cy + 28} ${cx + 16} ${cy + 14}" fill="none" stroke="${INK}" stroke-width="5" stroke-linecap="round"/></g>`;
+}
+export function heartSVG(cx, cy, s = 1) {
+  return `<path d="M${cx} ${cy + 18 * s} C${cx - 30 * s} ${cy - 6 * s} ${cx - 14 * s} ${cy - 26 * s} ${cx} ${cy - 8 * s} C${cx + 14 * s} ${cy - 26 * s} ${cx + 30 * s} ${cy - 6 * s} ${cx} ${cy + 18 * s} Z" fill="#d94f3d" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/>`;
+}
+export function moonSVG(cx, cy, s = 1) {
+  return `<path d="M${cx} ${cy - 26 * s} a26 26 0 1 0 10 44 a20 20 0 1 1 -10 -44 Z" fill="#f2c94c" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/>`;
+}
+export function starSVG(cx, cy, s = 1) {
+  return `<path d="M${cx} ${cy - 16 * s} L${cx + 5 * s} ${cy - 5 * s} L${cx + 16 * s} ${cy} L${cx + 5 * s} ${cy + 5 * s} L${cx} ${cy + 16 * s} L${cx - 5 * s} ${cy + 5 * s} L${cx - 16 * s} ${cy} L${cx - 5 * s} ${cy - 5 * s} Z" fill="#f2c94c" stroke="${INK}" stroke-width="3.5" stroke-linejoin="round"/>`;
+}
+export function zzzSVG(cx, cy, s = 1) {
+  return `<text x="${cx}" y="${cy}" font-family="Arial, Helvetica, sans-serif" font-size="${26 * s}" font-weight="800" fill="${INK}">Z</text><text x="${cx + 22 * s}" y="${cy - 14 * s}" font-family="Arial, Helvetica, sans-serif" font-size="${20 * s}" font-weight="800" fill="${INK}">z</text><text x="${cx + 40 * s}" y="${cy - 24 * s}" font-family="Arial, Helvetica, sans-serif" font-size="${15 * s}" font-weight="800" fill="${INK}">z</text>`;
+}
+
+// Cành cà phê: hoa trắng 5 cánh + lá xanh.
+export function branchSVG(cx, cy, s = 1) {
+  const flower = (x, y) => `<g>${[0, 72, 144, 216, 288].map((a) => {
+    const r = (a * Math.PI) / 180;
+    return `<circle cx="${x + Math.cos(r) * 13 * s}" cy="${y + Math.sin(r) * 13 * s}" r="${9 * s}" fill="#fff" stroke="${INK}" stroke-width="3"/>`;
+  }).join("")}<circle cx="${x}" cy="${y}" r="${6 * s}" fill="#f2c94c" stroke="${INK}" stroke-width="2.5"/></g>`;
+  const leaf = (x, y, rot) => `<path d="M${x} ${y} Q${x + 26 * s} ${y - 16 * s} ${x + 40 * s} ${y} Q${x + 22 * s} ${y + 12 * s} ${x} ${y} Z" fill="#6db35a" stroke="${INK}" stroke-width="3.5" stroke-linejoin="round" transform="rotate(${rot} ${x} ${y})"/>`;
+  return `<g>
+    <path d="M${cx - 130 * s} ${cy + 40 * s} Q${cx} ${cy - 30 * s} ${cx + 130 * s} ${cy + 20 * s}" fill="none" stroke="#8a5a3b" stroke-width="${7 * s}" stroke-linecap="round"/>
+    ${leaf(cx - 70 * s, cy + 6 * s, -25)}${leaf(cx + 30 * s, cy - 8 * s, 15)}${leaf(cx + 90 * s, cy + 14 * s, -10)}
+    ${flower(cx - 95 * s, cy - 18 * s)}${flower(cx - 5 * s, cy - 34 * s)}${flower(cx + 75 * s, cy - 6 * s)}
+  </g>`;
+}
+
+// Cây cà phê: thân + tán lá + quả đỏ.
+export function treeSVG(cx, feetY, s = 1) {
+  const cherry = (x, y, r = 11) => `<circle cx="${x}" cy="${y}" r="${r * s}" fill="#d94f3d" stroke="${INK}" stroke-width="3.5"/>`;
+  return `<g data-char="tree">
+    ${shadowSVG(cx, feetY + 2, 90 * s)}
+    <path d="M${cx - 14 * s} ${feetY} L${cx - 8 * s} ${feetY - 110 * s} L${cx + 8 * s} ${feetY - 110 * s} L${cx + 14 * s} ${feetY} Z" fill="#8a5a3b" stroke="${INK}" stroke-width="4.5" stroke-linejoin="round"/>
+    <path d="${blobPath(cx, feetY - 170 * s, 95 * s, 80 * s, 21)}" fill="#5da24a" stroke="${INK}" stroke-width="6" stroke-linejoin="round"/>
+    <path d="${blobPath(cx - 62 * s, feetY - 120 * s, 52 * s, 44 * s, 23)}" fill="#6db35a" stroke="${INK}" stroke-width="5" stroke-linejoin="round"/>
+    <path d="${blobPath(cx + 62 * s, feetY - 120 * s, 52 * s, 44 * s, 25)}" fill="#6db35a" stroke="${INK}" stroke-width="5" stroke-linejoin="round"/>
+    ${cherry(cx - 40 * s, feetY - 140 * s)}${cherry(cx + 30 * s, feetY - 170 * s)}${cherry(cx + 66 * s, feetY - 108 * s)}${cherry(cx - 66 * s, feetY - 100 * s, 9)}${cherry(cx + 6 * s, feetY - 120 * s, 9)}
+  </g>`;
+}
+
+// Giỏ tre đựng quả cà phê đỏ.
+export function basketSVG(cx, feetY, s = 1) {
+  return `<g data-char="basket">
+    ${shadowSVG(cx, feetY + 2, 62 * s)}
+    <circle cx="${cx - 34 * s}" cy="${feetY - 78 * s}" r="${13 * s}" fill="#d94f3d" stroke="${INK}" stroke-width="3.5"/><circle cx="${cx - 8 * s}" cy="${feetY - 88 * s}" r="${14 * s}" fill="#e0685a" stroke="${INK}" stroke-width="3.5"/><circle cx="${cx + 20 * s}" cy="${feetY - 80 * s}" r="${13 * s}" fill="#d94f3d" stroke="${INK}" stroke-width="3.5"/><circle cx="${cx + 42 * s}" cy="${feetY - 68 * s}" r="${11 * s}" fill="#e0685a" stroke="${INK}" stroke-width="3.5"/>
+    <path d="M${cx - 58 * s} ${feetY - 66 * s} L${cx + 58 * s} ${feetY - 66 * s} L${cx + 44 * s} ${feetY} L${cx - 44 * s} ${feetY} Z" fill="#c08a4e" stroke="${INK}" stroke-width="5" stroke-linejoin="round"/>
+    <path d="M${cx - 52 * s} ${feetY - 44 * s} L${cx + 52 * s} ${feetY - 44 * s} M${cx - 48 * s} ${feetY - 22 * s} L${cx + 48 * s} ${feetY - 22 * s}" stroke="${INK}" stroke-width="3" opacity="0.45"/>
+  </g>`;
+}
+
+// Máy rang: trống quay + lửa dưới.
+export function roasterSVG(cx, feetY, s = 1) {
+  return `<g data-char="roaster">
+    ${shadowSVG(cx, feetY + 2, 80 * s)}
+    <path d="M${cx - 66 * s} ${feetY - 44 * s} L${cx - 66 * s} ${feetY - 6 * s} M${cx + 66 * s} ${feetY - 44 * s} L${cx + 66 * s} ${feetY - 6 * s}" stroke="${INK}" stroke-width="7" stroke-linecap="round"/>
+    <path d="M${cx - 42 * s} ${feetY - 30 * s} q${10 * s} ${-26 * s} ${28 * s} ${-28 * s} q${8 * s} ${18 * s} ${28 * s} ${8 * s} q${18 * s} ${5 * s} ${15 * s} ${20 * s}" fill="#e07a3f" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/>
+    <rect x="${cx - 78 * s}" y="${feetY - 128 * s}" width="${156 * s}" height="${86 * s}" rx="${18 * s}" fill="#8a8a8a" stroke="${INK}" stroke-width="6"/>
+    <circle cx="${cx}" cy="${feetY - 85 * s}" r="${28 * s}" fill="#3d2b1f" stroke="${INK}" stroke-width="5"/>
+    ${beanSVG(cx - 12 * s, feetY - 88 * s, 0.55, -20)}${beanSVG(cx + 12 * s, feetY - 80 * s, 0.55, 15)}
+    <circle cx="${cx + 92 * s}" cy="${feetY - 85 * s}" r="9" fill="${INK}"/>
+    <path d="M${cx - 78 * s} ${feetY - 128 * s} q${78 * s} ${-26 * s} ${156 * s} 0" fill="none" stroke="#fff" stroke-width="4" opacity="0.5" stroke-linecap="round"/>
+  </g>`;
+}
+
+// Máy espresso: hộp + tay cầm phin + vòi hơi + tách dưới.
+export function machineSVG(cx, feetY, s = 1) {
+  return `<g data-char="machine">
+    ${shadowSVG(cx, feetY + 2, 78 * s)}
+    <rect x="${cx - 72 * s}" y="${feetY - 6 * s}" width="144" height="10" rx="4" fill="#8a5a3b" stroke="${INK}" stroke-width="4"/>
+    <rect x="${cx - 62 * s}" y="${feetY - 150 * s}" width="124" height="104" rx="12" fill="#d9d9d9" stroke="${INK}" stroke-width="6"/>
+    <rect x="${cx - 62 * s}" y="${feetY - 150 * s}" width="124" height="22" rx="10" fill="#efefef" stroke="${INK}" stroke-width="4"/>
+    <ellipse cx="${cx - 28 * s}" cy="${feetY - 150 * s}" rx="15" ry="5" fill="#fff" stroke="${INK}" stroke-width="3.5"/>
+    <ellipse cx="${cx + 28 * s}" cy="${feetY - 150 * s}" rx="15" ry="5" fill="#fff" stroke="${INK}" stroke-width="3.5"/>
+    <rect x="${cx - 40 * s}" y="${feetY - 116 * s}" width="80" height="26" rx="8" fill="#4a90d9" stroke="${INK}" stroke-width="4"/>
+    <circle cx="${cx - 20 * s}" cy="${feetY - 103 * s}" r="5" fill="#fff"/><circle cx="${cx + 20 * s}" cy="${feetY - 103 * s}" r="5" fill="#f2c94c"/>
+    <circle cx="${cx}" cy="${feetY - 66 * s}" r="13" fill="#fff" stroke="${INK}" stroke-width="4"/>
+    <line x1="${cx}" y1="${feetY - 66 * s}" x2="${cx + 8 * s}" y2="${feetY - 76 * s}" stroke="#d94f3d" stroke-width="3" stroke-linecap="round"/>
+    <line x1="${cx - 62 * s}" y1="${feetY - 96 * s}" x2="${cx - 78 * s}" y2="${feetY - 58 * s}" stroke="${INK}" stroke-width="5" stroke-linecap="round"/>
+    <rect x="${cx - 18 * s}" y="${feetY - 46 * s}" width="36" height="12" rx="4" fill="${INK}"/>
+    <line x1="${cx + 18 * s}" y1="${feetY - 40 * s}" x2="${cx + 54 * s}" y2="${feetY - 40 * s}" stroke="${INK}" stroke-width="7" stroke-linecap="round"/>
+    <circle cx="${cx + 56 * s}" cy="${feetY - 40 * s}" r="5" fill="${INK}"/>
+    <path d="M${cx} ${feetY - 34 * s} q3 8 0 12" fill="none" stroke="#6b4226" stroke-width="4" stroke-linecap="round"/>
+    <g transform="translate(${cx} ${feetY}) scale(0.62)">${cupSVG(0, 0, { face: "cuoi", steam: false, coffee: "#a97a4f" })}</g>
+  </g>`;
+}
+
+// Ly bạc xỉu cao: lớp sữa trắng dưới, cà phê nâu trên, đá + ống hút.
+export function layerGlassSVG(cx, feetY, s = 1) {
+  return `<g data-char="glass">
+    ${shadowSVG(cx, feetY + 2, 40 * s)}
+    <path d="M${cx - 30 * s} ${feetY - 128 * s} L${cx + 30 * s} ${feetY - 128 * s} L${cx + 22 * s} ${feetY} L${cx - 22 * s} ${feetY} Z" fill="#fff" stroke="${INK}" stroke-width="5" stroke-linejoin="round"/>
+    <path d="M${cx - 27 * s} ${feetY - 62 * s} L${cx + 27 * s} ${feetY - 62 * s} L${cx + 22 * s} ${feetY} L${cx - 22 * s} ${feetY} Z" fill="#fdf6ec" stroke="${INK}" stroke-width="3"/>
+    <path d="M${cx - 29 * s} ${feetY - 112 * s} L${cx + 29 * s} ${feetY - 112 * s} L${cx + 27 * s} ${feetY - 62 * s} L${cx - 27 * s} ${feetY - 62 * s} Z" fill="#a97a4f"/>
+    <rect x="${cx - 14 * s}" y="${feetY - 106 * s}" width="20" height="20" rx="4" fill="#dff3ff" stroke="${INK}" stroke-width="3" transform="rotate(12 ${cx - 4 * s} ${feetY - 96 * s})"/>
+    <path d="M${cx + 12 * s} ${feetY - 128 * s} L${cx + 26 * s} ${feetY - 158 * s}" stroke="#d94f3d" stroke-width="7" stroke-linecap="round"/>
+  </g>`;
+}
+
+// Ly cà phê trứng: bọt vàng dày + rắc cacao.
+export function eggCupSVG(cx, feetY, s = 1) {
+  return `<g data-char="eggcup">
+    ${shadowSVG(cx, feetY + 2, 56 * s)}
+    <ellipse cx="${cx}" cy="${feetY + 2}" rx="60" ry="9" fill="#e8e0d0" stroke="${INK}" stroke-width="4.5"/>
+    <path d="M${cx - 52 * s} ${feetY - 76 * s} L${cx + 52 * s} ${feetY - 76 * s} L${cx + 44 * s} ${feetY - 8 * s} Q${cx + 40 * s} ${feetY + 4 * s} ${cx} ${feetY + 4 * s} Q${cx - 40 * s} ${feetY + 4 * s} ${cx - 44 * s} ${feetY - 8 * s} Z" fill="#fffdf8" stroke="${INK}" stroke-width="5.5" stroke-linejoin="round"/>
+    <ellipse cx="${cx}" cy="${feetY - 76 * s}" rx="52" ry="9" fill="#f2c94c" stroke="${INK}" stroke-width="4.5"/>
+    <circle cx="${cx - 18 * s}" cy="${feetY - 76 * s}" r="2.5" fill="#8a5a3b"/><circle cx="${cx + 8 * s}" cy="${feetY - 78 * s}" r="2.5" fill="#8a5a3b"/><circle cx="${cx + 24 * s}" cy="${feetY - 74 * s}" r="2.5" fill="#8a5a3b"/>
+    <path d="M${cx + 52 * s} ${feetY - 60 * s} Q${cx + 76 * s} ${feetY - 54 * s} ${cx + 72 * s} ${feetY - 30 * s} Q${cx + 68 * s} ${feetY - 12 * s} ${cx + 48 * s} ${feetY - 14 * s}" fill="none" stroke="${INK}" stroke-width="9" stroke-linecap="round"/>
+    ${faceSVG(cx, feetY - 44, 0.55, "cuoi")}
+  </g>`;
+}
+
+// Tháp cold brew: bình trên nhỏ giọt xuống bình dưới.
+export function dripTowerSVG(cx, feetY, s = 1) {
+  return `<g data-char="tower">
+    ${shadowSVG(cx, feetY + 2, 52 * s)}
+    <path d="M${cx - 26 * s} ${feetY - 150 * s} L${cx + 26 * s} ${feetY - 150 * s} L${cx + 20 * s} ${feetY - 104 * s} L${cx - 20 * s} ${feetY - 104 * s} Z" fill="#dff3ff" stroke="${INK}" stroke-width="5" stroke-linejoin="round"/>
+    <path d="M${cx - 22 * s} ${feetY - 122 * s} L${cx + 22 * s} ${feetY - 122 * s} L${cx + 20 * s} ${feetY - 104 * s} L${cx - 20 * s} ${feetY - 104 * s} Z" fill="#bfe3f5"/>
+    <path d="M${cx - 30 * s} ${feetY - 104 * s} L${cx + 30 * s} ${feetY - 104 * s} L${cx + 30 * s} ${feetY - 96 * s} L${cx - 30 * s} ${feetY - 96 * s} Z" fill="#8a5a3b" stroke="${INK}" stroke-width="4"/>
+    <path d="M${cx} ${feetY - 96 * s} L${cx} ${feetY - 52 * s}" stroke="${INK}" stroke-width="5" stroke-linecap="round"/>
+    <circle cx="${cx}" cy="${feetY - 44 * s}" r="4" fill="#6b4226"/>
+    <path d="M${cx - 24 * s} ${feetY - 40 * s} L${cx + 24 * s} ${feetY - 40 * s} L${cx + 18 * s} ${feetY} L${cx - 18 * s} ${feetY} Z" fill="#dff3ff" stroke="${INK}" stroke-width="5" stroke-linejoin="round"/>
+    <path d="M${cx - 21 * s} ${feetY - 18 * s} L${cx + 21 * s} ${feetY - 18 * s} L${cx + 18 * s} ${feetY} L${cx - 18 * s} ${feetY} Z" fill="#6b4226"/>
+  </g>`;
+}
+
+// Ghế nhựa vỉa hè.
+export function stoolSVG(cx, feetY, s = 1, color = "#4a90d9") {
+  return `<g>
+    <rect x="${cx - 34 * s}" y="${feetY - 52 * s}" width="68" height="16" rx="8" fill="${color}" stroke="${INK}" stroke-width="4.5"/>
+    <path d="M${cx - 26 * s} ${feetY - 36 * s} L${cx - 32 * s} ${feetY} M${cx + 26 * s} ${feetY - 36 * s} L${cx + 32 * s} ${feetY}" stroke="${INK}" stroke-width="6" stroke-linecap="round"/>
+    <path d="M${cx - 26 * s} ${feetY - 36 * s} L${cx - 32 * s} ${feetY} M${cx + 26 * s} ${feetY - 36 * s} L${cx + 32 * s} ${feetY}" stroke="${color}" stroke-width="3" stroke-linecap="round"/>
+  </g>`;
+}
+
+// Laptop làm việc đêm.
+export function laptopSVG(cx, feetY, s = 1) {
+  return `<g>
+    ${shadowSVG(cx, feetY + 2, 70 * s)}
+    <rect x="${cx - 66 * s}" y="${feetY - 96 * s}" width="132" height="84" rx="10" fill="#3b3b6e" stroke="${INK}" stroke-width="5.5"/>
+    <rect x="${cx - 56 * s}" y="${feetY - 86 * s}" width="112" height="64" rx="6" fill="#fdf6c9" stroke="${INK}" stroke-width="3.5"/>
+    <text x="${cx}" y="${feetY - 44 * s}" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="${20 * s}" font-weight="800" fill="${INK}">deadline</text>
+    <path d="M${cx - 78 * s} ${feetY - 12 * s} L${cx + 78 * s} ${feetY - 12 * s} L${cx + 66 * s} ${feetY} L${cx - 66 * s} ${feetY} Z" fill="#8a8a8a" stroke="${INK}" stroke-width="5" stroke-linejoin="round"/>
+  </g>`;
+}
+
+// Não + hạt caffeine đuổi cơn buồn ngủ.
+export function brainSVG(cx, cy, s = 1) {
+  return `<g>
+    <path d="${blobPath(cx, cy, 62 * s, 48 * s, 31)}" fill="#f2a0a0" stroke="${INK}" stroke-width="5.5" stroke-linejoin="round"/>
+    <path d="M${cx - 34 * s} ${cy - 14 * s} q12 -14 24 -4 M${cx - 6 * s} ${cy - 22 * s} q12 -10 22 2 M${cx - 30 * s} ${cy + 12 * s} q12 -10 24 -2" fill="none" stroke="#d94f3d" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="${cx - 20 * s}" cy="${cy + 2 * s}" r="5" fill="${INK}"/><circle cx="${cx + 18 * s}" cy="${cy + 2 * s}" r="5" fill="${INK}"/>
+    <path d="M${cx - 10 * s} ${cy + 18 * s} Q${cx} ${cy + 28 * s} ${cx + 10 * s} ${cy + 18 * s}" fill="none" stroke="${INK}" stroke-width="4" stroke-linecap="round"/>
+  </g>`;
+}
+
+// Đồng hồ treo tường, kim chỉ giờ h, phút m.
+export function clockSVG(cx, cy, s = 1, h = 9, m = 0) {
+  const ha = ((h % 12) + m / 60) * 30 - 90, ma = m * 6 - 90;
+  const rad = (a) => (a * Math.PI) / 180;
+  const hx = cx + Math.cos(rad(ha)) * 22 * s, hy = cy + Math.sin(rad(ha)) * 22 * s;
+  const mx = cx + Math.cos(rad(ma)) * 34 * s, my = cy + Math.sin(rad(ma)) * 34 * s;
+  return `<g>
+    <circle cx="${cx}" cy="${cy}" r="${52 * s}" fill="#fff" stroke="${INK}" stroke-width="6"/>
+    ${[0, 90, 180, 270].map((a) => {
+      const r2 = (a * Math.PI) / 180;
+      return `<circle cx="${cx + Math.cos(r2) * 42 * s}" cy="${cy + Math.sin(r2) * 42 * s}" r="${3.5 * s}" fill="${INK}"/>`;
+    }).join("")}
+    <line x1="${cx}" y1="${cy}" x2="${hx}" y2="${hy}" stroke="${INK}" stroke-width="6" stroke-linecap="round"/>
+    <line x1="${cx}" y1="${cy}" x2="${mx}" y2="${my}" stroke="${INK}" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="${cx}" cy="${cy}" r="5" fill="${INK}"/>
+  </g>`;
+}
+
+// Cừu đếm cừu.
+export function sheepSVG(cx, feetY, s = 1) {
+  return `<g>
+    ${shadowSVG(cx, feetY + 2, 46 * s)}
+    <circle cx="${cx - 26 * s}" cy="${feetY - 52 * s}" r="18" fill="#fff" stroke="${INK}" stroke-width="4"/><circle cx="${cx}" cy="${feetY - 62 * s}" r="20" fill="#fff" stroke="${INK}" stroke-width="4"/><circle cx="${cx + 26 * s}" cy="${feetY - 52 * s}" r="18" fill="#fff" stroke="${INK}" stroke-width="4"/>
+    <circle cx="${cx + 40 * s}" cy="${feetY - 58 * s}" r="16" fill="#3b2a1a" stroke="${INK}" stroke-width="4"/>
+    <circle cx="${cx + 36 * s}" cy="${feetY - 62 * s}" r="2.5" fill="#fff"/><circle cx="${cx + 46 * s}" cy="${feetY - 62 * s}" r="2.5" fill="#fff"/>
+    <path d="M${cx - 20 * s} ${feetY - 34 * s} L${cx - 22 * s} ${feetY - 6 * s} M${cx + 20 * s} ${feetY - 34 * s} L${cx + 22 * s} ${feetY - 6 * s}" stroke="${INK}" stroke-width="5" stroke-linecap="round"/>
   </g>`;
 }
