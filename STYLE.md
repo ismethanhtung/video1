@@ -38,9 +38,19 @@ Phong cách của video Bilibili 画渣花小烙 (BV1TBx46pEwA). Skill đầy đ
    mỗi cái nhìn 1 giây là nhận ra. Để khoảng trống có chủ ý.
 10. **Tư thế kể chuyện:** nằm dài, gục xuống, ngồi bệt, ôm tách — đừng bao
     giờ xếp nhân vật đứng thẳng như sơ đồ.
-11. **Phụ đề:** giữ nguyên (chữ đậm đen, viền trắng, đáy khung, 1 dòng,
-    tối đa 46 ký tự). Phụ đề là lời kể, chữ tiêu đề lớn là tên cảnh — hai
-    việc khác nhau.
+12. **Hệ thống: phong cách cố định, nội dung tham số hóa.** Phong cách
+    (nét, màu, mặt, dấu hiệu cảm xúc, chữ tiêu đề, phụ đề) KHÔNG BAO GIỜ
+    đổi theo câu chuyện. Nội dung đổi bằng tham số: loài (cô gái, hạt,
+    tách, sư tử...), tư thế (`dung`/`ngoi`/`ban`, tay dang), trang phục
+    (`hien-dai`, váy + quần + giày, `co-dai` hán phục + búi + trâm + quạt),
+    hoạt động/đạo cụ (gõ laptop, ngồi sofa, cầm điện thoại, đèn lồng,
+    bong bóng thoại), cảm xúc (`cuoi`/`thuong`/`buon`/`khoc`/`met`/
+    `ngac-nhien`/`gian`/`hoi`/`buc`). Cần cái mới thì thêm 1 giá trị tham
+    số hoặc 1 hàm đạo cụ nhỏ — không bao giờ vẽ lại nhân vật từ đầu.
+13. **Mềm mại:** hình tròn mềm khắp nơi (đầu tóc xoăn cụp vào, sofa là
+    khối tròn lớn, laptop bo tròn), má hồng là mảng oval LỚN, con ngươi
+    nhìn lệch/xuống, tư thế tự nhiên thư giãn (ngồi xếp bằng, dang tay
+    nhún vai, tay đặt trên bàn phím), đạo cụ to mềm và ít.
 
 ## Bảng biểu cảm
 
@@ -67,11 +77,14 @@ Phong cách của video Bilibili 画渣花小烙 (BV1TBx46pEwA). Skill đầy đ
 
 ## Ánh xạ vào code
 
-- `src/doodle.js`: `faceSVG` (mắt to, mí, quầng, miệng), `blushDots`/`blushOval`,
-  `girlSVG` (tóc dài hình chuông + mái + sợi cong đỉnh đầu; opts `shirt`,
-  `hands`, `cup`), `blobCharSVG`, `cupSVG`, `tearSVG`,
-  `trembleSVG`, `sweatSVG`, `titleTextSVG`, `colorBgSVG`, `warmBgSVG`,
-  `doodleSub`.
+- `src/doodle.js`: `faceSVG` (mắt to, mí, quầng, miệng; biểu cảm
+  `cuoi`/`thuong`/`buon`/`khoc`/`met`/`ngac-nhien`/`gian`/`hoi`/`buc`),
+  `blushDots`/`blushOval`, `girlSVG` (tóc dài hình chuông + mái + sợi cong
+  đỉnh đầu; opts `pose`, `outfit`, `skirt`, `arms`, `bun`, `fan`, `phone`,
+  `shirt`, `hands`, `cup`), `blobCharSVG`, `cupSVG`, `lionSVG` (bờm gai
+  hoặc tai tròn, mũi sẫm, râu), `couchSVG`, `laptopDeskSVG`, `bubbleSVG`,
+  `tearSVG`, `trembleSVG`, `sweatSVG`, `titleTextSVG`, `colorBgSVG`,
+  `warmBgSVG`, `doodleSub`.
 - `src/coffeeStory.js`: 30 cảnh video cà phê; các cảnh cảm xúc dùng dấu hiệu
   cảm xúc của skill này.
 - Kiểm chứng: `~/workspace/verify_coffee.mjs` + render thật bằng
