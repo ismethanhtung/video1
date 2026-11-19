@@ -3,6 +3,7 @@ import { renderStoryFrame, STORY, STORY_DURATION, storySceneAt } from "./story.j
 import { renderVillageFrame, VILLAGE_STORY, VILLAGE_DURATION, villageSceneAt } from "./villageStory.js";
 import { renderDoraemonFrame, DORAEMON_STORY, DORAEMON_DURATION, doraemonSceneAt } from "./doraemonStory.js";
 import { renderDesertFrame, DESERT_STORY, DESERT_DURATION, desertSceneAt } from "./desertStory.js";
+import { renderCoffeeFrame, COFFEE_FRAMES, COFFEE_FRAME_COUNT } from "./coffeeStory.js";
 import { sfx, setSoundEnabled, isSoundEnabled } from "./sound.js";
 
 // Timeline demo: 5 cảnh, tổng 16 giây.
@@ -41,6 +42,7 @@ const state = {
   desertPlaying: false,
   desertStartAt: 0,
   desertLastScene: -1,
+  coffeeIndex: 0,
 };
 
 const $ = (id) => document.getElementById(id);
@@ -96,6 +98,22 @@ function renderStory(t) {
 // ${scene.sub}`;
   document.querySelectorAll("[data-story-scene]").forEach(b =>
     b.classList.toggle("active", Number(b.dataset.storyScene) === index));
+}
+
+function renderCoffee(i) {
+  state.coffeeIndex = i;
+  stage.innerHTML = renderCoffeeFrame(i);
+  const f = COFFEE_FRAMES[i];
+  $("stage-title").textContent = `☕ ${f.title}`;
+  $("stage-badge").textContent = "CÀ PHÊ • VẼ TAY • ẢNH TĨNH";
+  $("story-sub").textContent = f.sub;
+  $("time-label").textContent = `Tranh cà phê: khung ${i + 1}/${COFFEE_FRAME_COUNT} — ${f.title}`;
+  codeView.textContent =
+`renderCoffeeFrame(${i})
+// Khung ${f.id}/${COFFEE_FRAME_COUNT}: ${f.title}
+// ${f.sub}`;
+  document.querySelectorAll("[data-coffee-frame]").forEach(b =>
+    b.classList.toggle("active", Number(b.dataset.coffeeFrame) === i));
 }
 
 function renderDesert(t) {
@@ -257,6 +275,10 @@ function tick() {
   requestAnimationFrame(tick);
 }
 
+$("coffee-btn").onclick = () => {
+  state.playing = false; state.storyPlaying = false; state.villagePlaying = false; state.doraemonPlaying = false; state.desertPlaying = false; state.mode = "coffee";
+  renderCoffee(state.coffeeIndex);
+};
 $("desert-btn").onclick = () => {
   state.playing = false; state.storyPlaying = false; state.villagePlaying = false; state.doraemonPlaying = false; state.mode = "desert"; state.desertPlaying = true; state.desertLastScene = -1;
   state.desertStartAt = performance.now();
@@ -522,6 +544,16 @@ DESERT_STORY.forEach((sc, i) => {
     renderDesert(i * 10 + 1);
   };
   $("desert-scenes").appendChild(b);
+});
+COFFEE_FRAMES.forEach((f, i) => {
+  const b = document.createElement("button");
+  b.textContent = `Cà phê ${f.id}: ${f.title}`;
+  b.dataset.coffeeFrame = i;
+  b.onclick = () => {
+    state.playing = false; state.storyPlaying = false; state.villagePlaying = false; state.doraemonPlaying = false; state.desertPlaying = false; state.mode = "coffee";
+    renderCoffee(i);
+  };
+  $("coffee-scenes").appendChild(b);
 });
 buildButtons();
 STORY.forEach((sc, i) => {
