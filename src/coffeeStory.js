@@ -4,6 +4,7 @@ import {
   doodleSun, heartSVG, moonSVG, starSVG, zzzSVG, branchSVG, treeSVG,
   basketSVG, roasterSVG, machineSVG, layerGlassSVG, eggCupSVG,
   dripTowerSVG, stoolSVG, laptopSVG, brainSVG, clockSVG,
+  tearSVG, trembleSVG, sweatSVG, titleTextSVG,
 } from "./doodle.js";
 
 // Video cà phê 5 phút: 30 cảnh × 10 giây = 300 giây.
@@ -69,12 +70,10 @@ function grinderSVG(cx, cy, s = 1) {
   </g>`;
 }
 
-const bigText = (x, y, text, fill = "#d94f3d", size = 52) =>
-  `<text x="${x}" y="${y}" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="${size}" font-weight="800" fill="${fill}" stroke="#fff" stroke-width="8" stroke-linejoin="round" paint-order="stroke">${text}</text>`;
-
 const S = [];
-// 1 — Giới thiệu
+// 1 — Giới thiệu: chữ tiêu đề lớn CÀ PHÊ sau lưng cô gái (kiểu ảnh gốc).
 S[0] = () => `${warmBgSVG()}
+  ${titleTextSVG("CÀ PHÊ", 480, 100, 96, "#ffffff", -2)}
   ${beanSVG(150, 150, 1.2, -25)}${beanSVG(810, 130, 1.1, 15)}${beanSVG(830, 320, 0.9, -10)}
   ${girlSVG(480, 470, { face: "cuoi", s: 1.05, cup: true })}`;
 // 2 — Bông hoa trắng
@@ -93,7 +92,7 @@ S[2] = () => {
 // 4 — Bi tỉnh dậy trong quả đỏ
 S[3] = () => `${gridPaperSVG()}
   ${cherrySVG(480, 330, 2.4)}
-  ${blobCharSVG(480, 285, { color: "#c08a4e", r: 46, face: "thuong", seed: 4 })}
+  ${blobCharSVG(480, 285, { color: "#c08a4e", r: 46, face: "met", seed: 4 })}
   ${zzzSVG(580, 190, 1.2)}`;
 // 5 — Hái quả
 S[4] = () => `${gridPaperSVG()}
@@ -132,7 +131,7 @@ S[9] = () => `${gridPaperSVG()}
   ${starSVG(200, 160, 1.2)}${starSVG(240, 220, 0.9)}`;
 // 11 — Hạt nổ
 S[10] = () => `${gridPaperSVG()}
-  ${bigText(480, 150, "BỤP! BỤP!")}
+  ${titleTextSVG("BỤP! BỤP!", 480, 150, 64, "#ffffff", -3)}
   ${blobCharSVG(240, 400, { color: "#8a5a3b", r: 56, face: "ngac-nhien", seed: 12 })}
   ${blobCharSVG(480, 370, { color: "#a97a4f", r: 56, face: "cuoi", seed: 13 })}
   ${blobCharSVG(720, 400, { color: "#6b4226", r: 56, face: "ngac-nhien", seed: 14 })}
@@ -211,10 +210,12 @@ S[22] = () => {
   ${p(350, "Thổ", "đặc sánh", `<g transform="translate(480 220) scale(0.8)">${cupSVG(0, 0, { face: "thuong", steam: false, coffee: "#3d2412" })}</g>`)}
   ${p(640, "Ethiopia", "nghi lễ", `<g transform="translate(770 220) scale(0.8)">${cupSVG(0, 0, { face: "cuoi", steam: true, coffee: "#a97a4f" })}</g>`)}`;
 };
-// 24 — Đêm deadline
+// 24 — Đêm deadline: cô gái mệt, quầng thâm, 1 giọt nước mắt, vạch run.
 S[23] = () => `${gridPaperSVG()}
   ${moonSVG(820, 110, 1.4)}${zzzSVG(700, 90, 0.9)}
+  ${trembleSVG(250, 265, 125, 4, 3)}
   ${girlSVG(250, 465, { face: "met", s: 0.85 })}
+  ${tearSVG(225, 292, 0.9)}${sweatSVG(318, 230, 0.9)}
   ${laptopSVG(620, 440, 1.1)}
   ${cupSVG(790, 440, { face: "met", steam: true })}`;
 // 25 — Caffeine vào não
@@ -237,7 +238,9 @@ S[26] = () => {
   const heart = `${heartSVG(628, 262, 1.1)}<path d="M668 240 l14 -8 M670 262 l16 0 M668 284 l14 8" stroke="${INK}" stroke-width="4" stroke-linecap="round"/>`;
   const shaky = `<g transform="translate(618 420) scale(0.55)">${cupSVG(0, 0, { face: "met", steam: false })}</g><path d="M664 398 q10 -8 0 -18 M672 414 q10 -8 0 -18" fill="none" stroke="${INK}" stroke-width="4" stroke-linecap="round"/>`;
   return `${gridPaperSVG()}
+  ${trembleSVG(300, 255, 130, 5, 5)}
   ${girlSVG(300, 470, { face: "met", s: 0.95 })}
+  ${tearSVG(272, 274, 1)}${tearSVG(328, 274, 1)}
   ${row(60, moon, "Mất ngủ")}
   ${row(198, heart, "Tim đập nhanh")}
   ${row(336, shaky, "Run tay")}`;

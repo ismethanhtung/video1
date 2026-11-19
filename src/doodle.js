@@ -39,6 +39,41 @@ export function gridPaperSVG() {
   <path d="M10 14 Q 480 6 950 12 L 952 528 Q 480 534 10 528 Z" fill="none" stroke="${INK}" stroke-width="8" stroke-linejoin="round"/>`;
 }
 
+// Nền màu phẳng tràn khung (kiểu ảnh gốc: nền xanh đêm, nâu ấm, xanh nhạt).
+export function colorBgSVG(color) {
+  return `<rect width="960" height="540" fill="${color}"/>
+  <path d="M10 14 Q 480 6 950 12 L 952 528 Q 480 534 10 528 Z" fill="none" stroke="${INK}" stroke-width="8" stroke-linejoin="round"/>`;
+}
+
+// Chữ tiêu đề LỚN: trắng viền nâu, hơi nghiêng, vẽ TRƯỚC nhân vật để đè lên.
+export function titleTextSVG(text, x, y, size, fill = "#ffffff", rot = -3) {
+  return `<text x="${x}" y="${y}" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="${size}" font-weight="800" fill="${fill}" stroke="${INK}" stroke-width="${Math.max(4, size / 9)}" stroke-linejoin="round" paint-order="stroke" transform="rotate(${rot} ${x} ${y})">${text}</text>`;
+}
+
+// Giọt nước mắt xanh.
+export function tearSVG(x, y, s = 1) {
+  return `<path d="M${x} ${y - 14 * s} C${x + 9 * s} ${y - 2 * s} ${x + 8 * s} ${y + 8 * s} ${x} ${y + 10 * s} C${x - 8 * s} ${y + 8 * s} ${x - 9 * s} ${y - 2 * s} ${x} ${y - 14 * s} Z" fill="#7fc4e8" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/>`;
+}
+
+// Giọt mồ hôi.
+export function sweatSVG(x, y, s = 1) {
+  return `<path d="M${x} ${y - 10 * s} C${x + 7 * s} ${y - 1 * s} ${x + 6 * s} ${y + 6 * s} ${x} ${y + 8 * s} C${x - 6 * s} ${y + 6 * s} ${x - 7 * s} ${y - 1 * s} ${x} ${y - 10 * s} Z" fill="#bfe3f5" stroke="${INK}" stroke-width="2.5" stroke-linejoin="round"/>`;
+}
+
+// Vạch run rẩy quanh một điểm: n vạch ngắn trên vòng tròn bán kính r.
+export function trembleSVG(cx, cy, r, n = 5, seed = 1) {
+  let out = "";
+  for (let i = 0; i < n; i++) {
+    const a = (i / n) * Math.PI * 2 + jhash(seed * 31 + i * 7) * 0.5;
+    const a1 = a - 0.07, a2 = a + 0.07;
+    const x1 = cx + Math.cos(a1) * r, y1 = cy + Math.sin(a1) * r;
+    const x2 = cx + Math.cos(a2) * r, y2 = cy + Math.sin(a2) * r;
+    const mx = cx + Math.cos(a) * (r + 7), my = cy + Math.sin(a) * (r + 7);
+    out += `<path d="M${x1.toFixed(0)} ${y1.toFixed(0)} Q${mx.toFixed(0)} ${my.toFixed(0)} ${x2.toFixed(0)} ${y2.toFixed(0)}" fill="none" stroke="${INK}" stroke-width="4" stroke-linecap="round" opacity="0.75"/>`;
+  }
+  return `<g>${out}</g>`;
+}
+
 // Nền cam ấm như cảnh cô gái dẫn chuyện trong video gốc.
 export function warmBgSVG() {
   return `<rect width="960" height="540" fill="#f7bd63"/>
@@ -59,40 +94,44 @@ export function doodleSub(text, maxLen = 46) {
   return `<g font-family="Arial, Helvetica, sans-serif" font-size="32" font-weight="800" text-anchor="middle" fill="#1a1a1a" stroke="#ffffff" stroke-width="7" stroke-linejoin="round" paint-order="stroke">${lines.map((l, i) => `<text x="480" y="${y0 + i * 38}">${l}</text>`).join("")}</g>`;
 }
 
-// Má hồng: 3 chấm mỗi bên (kiểu nhân vật hạt) hoặc 2 vệt oval (kiểu cô gái).
+// Má hồng: mảng oval mềm mỗi bên + 1 chấm nhỏ (kiểu ảnh gốc).
 export function blushDots(cx, cy, s = 1) {
-  const dot = (x, y) => `<circle cx="${x}" cy="${y}" r="${3.5 * s}" fill="#f28b8b"/>`;
-  return `<g>${dot(cx - 58 * s, cy + 2 * s)}${dot(cx - 48 * s, cy + 8 * s)}${dot(cx - 68 * s, cy + 8 * s)}${dot(cx + 58 * s, cy + 2 * s)}${dot(cx + 48 * s, cy + 8 * s)}${dot(cx + 68 * s, cy + 8 * s)}</g>`;
+  return `<g><ellipse cx="${cx - 54 * s}" cy="${cy + 8 * s}" rx="${12 * s}" ry="${7 * s}" fill="#f2a0c0" opacity="0.9"/><ellipse cx="${cx + 54 * s}" cy="${cy + 8 * s}" rx="${12 * s}" ry="${7 * s}" fill="#f2a0c0" opacity="0.9"/><circle cx="${cx - 68 * s}" cy="${cy + 2 * s}" r="${3 * s}" fill="#f2a0c0"/><circle cx="${cx + 68 * s}" cy="${cy + 2 * s}" r="${3 * s}" fill="#f2a0c0"/></g>`;
 }
 function blushOval(cx, cy, s = 1) {
   return `<ellipse cx="${cx - 62 * s}" cy="${cy + 8 * s}" rx="${15 * s}" ry="${9 * s}" fill="#f2a0a0" opacity="0.85"/><ellipse cx="${cx + 62 * s}" cy="${cy + 8 * s}" rx="${15 * s}" ry="${9 * s}" fill="#f2a0a0" opacity="0.85"/>`;
 }
 
-// Khuôn mặt, tâm (cx, cy), tỉ lệ s. Biểu cảm:
+// Khuôn mặt, tâm (cx, cy), tỉ lệ s. Quy tắc 画渣: mắt là 2 vòng tròn trắng LỚN
+// (đường kính ≈ 25% chiều rộng mặt), con ngươi nhỏ, nhìn lệch/xuống; miệng nhỏ.
 // cuoi: mắt nhắm cong + miệng cười há to | thuong: mắt nửa nhắm + miệng ^
-// buon: mắt nửa nhắm + miệng tam giác | buc: cau mày + miệng ^ + vạch giận
-// met: quầng thâm + miệng ngang | ngac-nhien: mắt tròn + miệng oval há
+// buon: mắt nửa nhắm + quầng + miệng lượn sóng | khoc: mắt nửa nhắm + miệng há
+// met: mắt to + quầng thâm + miệng ngang | ngac-nhien: mắt tròn to + miệng oval há
 export function faceSVG(cx, cy, s = 1, expr = "thuong") {
   const eyeY = cy - 10 * s, ex = 26 * s;
-  const halfEye = (x) => `<ellipse cx="${x}" cy="${eyeY}" rx="${20 * s}" ry="${15 * s}" fill="#fff" stroke="${INK}" stroke-width="${4.5 * s}"/><path d="M${x - 20 * s} ${eyeY - 4 * s} Q${x} ${eyeY - 18 * s} ${x + 20 * s} ${eyeY - 4 * s}" fill="none" stroke="${INK}" stroke-width="${4.5 * s}" stroke-linecap="round"/><circle cx="${x}" cy="${eyeY + 5 * s}" r="${5 * s}" fill="${INK}"/>`;
-  const happyEye = (x) => `<path d="M${x - 19 * s} ${eyeY} Q${x} ${eyeY - 17 * s} ${x + 19 * s} ${eyeY}" fill="none" stroke="${INK}" stroke-width="${5 * s}" stroke-linecap="round"/>`;
+  const bigEye = (x, pupilDy = 5 * s, pupilR = 6 * s) =>
+    `<circle cx="${x}" cy="${eyeY}" r="${17 * s}" fill="#fff" stroke="${INK}" stroke-width="${4.5 * s}"/><circle cx="${x}" cy="${eyeY + pupilDy}" r="${pupilR}" fill="${INK}"/>`;
+  const halfEye = (x) => `<ellipse cx="${x}" cy="${eyeY}" rx="${21 * s}" ry="${17 * s}" fill="#fff" stroke="${INK}" stroke-width="${4.5 * s}"/><path d="M${x - 21 * s} ${eyeY - 5 * s} Q${x} ${eyeY - 20 * s} ${x + 21 * s} ${eyeY - 5 * s}" fill="none" stroke="${INK}" stroke-width="${4.5 * s}" stroke-linecap="round"/><circle cx="${x}" cy="${eyeY + 6 * s}" r="${5.5 * s}" fill="${INK}"/>`;
+  const happyEye = (x) => `<path d="M${x - 21 * s} ${eyeY} Q${x} ${eyeY - 18 * s} ${x + 21 * s} ${eyeY}" fill="none" stroke="${INK}" stroke-width="${5 * s}" stroke-linecap="round"/>`;
   const mouthY = cy + 30 * s;
   const mouths = {
     cuoi: `<path d="M${cx - 32 * s} ${mouthY - 6 * s} Q${cx} ${mouthY - 14 * s} ${cx + 32 * s} ${mouthY - 6 * s} Q${cx + 32 * s} ${mouthY + 34 * s} ${cx} ${mouthY + 38 * s} Q${cx - 32 * s} ${mouthY + 34 * s} ${cx - 32 * s} ${mouthY - 6 * s} Z" fill="#d95f4b" stroke="${INK}" stroke-width="${4.5 * s}" stroke-linejoin="round"/>`,
     thuong: `<path d="M${cx - 13 * s} ${mouthY + 4 * s} Q${cx} ${mouthY - 12 * s} ${cx + 13 * s} ${mouthY + 4 * s}" fill="none" stroke="${INK}" stroke-width="${5 * s}" stroke-linecap="round"/>`,
-    buon: `<path d="M${cx - 15 * s} ${mouthY + 2 * s} L${cx + 15 * s} ${mouthY + 2 * s} L${cx} ${mouthY - 22 * s} Z" fill="#d95f4b" stroke="${INK}" stroke-width="${4 * s}" stroke-linejoin="round"/>`,
+    buon: `<path d="M${cx - 16 * s} ${mouthY} q8 -8 16 0 q8 8 16 0" fill="none" stroke="${INK}" stroke-width="${5 * s}" stroke-linecap="round"/>`,
+    khoc: `<ellipse cx="${cx}" cy="${mouthY + 8 * s}" rx="${15 * s}" ry="${19 * s}" fill="#d95f4b" stroke="${INK}" stroke-width="${4 * s}"/><path d="M${cx - 15 * s} ${mouthY - 4 * s} q7 -7 15 0 q8 7 15 0" fill="none" stroke="${INK}" stroke-width="${3.5 * s}" stroke-linecap="round"/>`,
     met: `<path d="M${cx - 14 * s} ${mouthY} L${cx + 14 * s} ${mouthY}" stroke="${INK}" stroke-width="${5 * s}" stroke-linecap="round"/>`,
     "ngac-nhien": `<ellipse cx="${cx}" cy="${mouthY + 8 * s}" rx="${12 * s}" ry="${16 * s}" fill="#d95f4b" stroke="${INK}" stroke-width="${4 * s}"/>`,
   };
   let eyes = "";
   if (expr === "cuoi") eyes = happyEye(cx - ex) + happyEye(cx + ex);
-  else if (expr === "ngac-nhien") eyes = `<circle cx="${cx - ex}" cy="${eyeY}" r="${15 * s}" fill="#fff" stroke="${INK}" stroke-width="${4.5 * s}"/><circle cx="${cx + ex}" cy="${eyeY}" r="${15 * s}" fill="#fff" stroke="${INK}" stroke-width="${4.5 * s}"/><circle cx="${cx - ex}" cy="${eyeY + 2 * s}" r="${6 * s}" fill="${INK}"/><circle cx="${cx + ex}" cy="${eyeY + 2 * s}" r="${6 * s}" fill="${INK}"/>`;
+  else if (expr === "ngac-nhien") eyes = bigEye(cx - ex, 2 * s) + bigEye(cx + ex, 2 * s);
+  else if (expr === "met") eyes = bigEye(cx - ex, 8 * s, 5 * s) + bigEye(cx + ex, 8 * s, 5 * s);
   else eyes = halfEye(cx - ex) + halfEye(cx + ex);
   const brow = expr === "buc"
     ? `<path d="M${cx - ex - 20 * s} ${eyeY - 26 * s} L${cx - ex + 18 * s} ${eyeY - 16 * s}" stroke="${INK}" stroke-width="${5 * s}" stroke-linecap="round"/><path d="M${cx + ex + 20 * s} ${eyeY - 26 * s} L${cx + ex - 18 * s} ${eyeY - 16 * s}" stroke="${INK}" stroke-width="${5 * s}" stroke-linecap="round"/>`
     : "";
-  const tired = expr === "met"
-    ? `<ellipse cx="${cx - ex}" cy="${eyeY + 14 * s}" rx="${16 * s}" ry="${6 * s}" fill="#c9b8a8" opacity="0.8"/><ellipse cx="${cx + ex}" cy="${eyeY + 14 * s}" rx="${16 * s}" ry="${6 * s}" fill="#c9b8a8" opacity="0.8"/>`
+  const tired = (expr === "met" || expr === "buon" || expr === "khoc")
+    ? `<ellipse cx="${cx - ex}" cy="${eyeY + 21 * s}" rx="${17 * s}" ry="${5.5 * s}" fill="#c9b8a8" opacity="0.85"/><ellipse cx="${cx + ex}" cy="${eyeY + 21 * s}" rx="${17 * s}" ry="${5.5 * s}" fill="#c9b8a8" opacity="0.85"/>`
     : "";
   const anger = expr === "buc"
     ? `<path d="M${cx + 78 * s} ${cy - 52 * s} q10 -14 2 -26 M${cx + 92 * s} ${cy - 40 * s} q12 -10 8 -22" fill="none" stroke="#d94f3d" stroke-width="${5 * s}" stroke-linecap="round"/>`
@@ -141,7 +180,8 @@ export function girlSVG(cx, feetY, opts = {}) {
   const hy = -205 * s; // tâm tóc sau
   const fy = -222 * s; // tâm mặt
   const hair = `<path d="${blobPath(0, hy, 112 * s, 148 * s, 7)}" fill="#6e4a2f" stroke="${INK}" stroke-width="6" stroke-linejoin="round"/>
-  <path d="M${-70 * s} ${-300 * s} q-14 60 -6 110 M${70 * s} ${-300 * s} q14 60 6 110" fill="none" stroke="#5a3a24" stroke-width="4" stroke-linecap="round" opacity="0.55"/>`;
+  <path d="M${-70 * s} ${-300 * s} q-14 60 -6 110 M${70 * s} ${-300 * s} q14 60 6 110" fill="none" stroke="#5a3a24" stroke-width="4" stroke-linecap="round" opacity="0.55"/>
+  <path d="M${-30 * s} ${-342 * s} q-8 -22 6 -30 M${24 * s} ${-344 * s} q10 -18 24 -16" fill="none" stroke="#6e4a2f" stroke-width="5" stroke-linecap="round"/>`;
   const faceShape = `<path d="${blobPath(0, fy, 86 * s, 80 * s, 11)}" fill="#fffdf8" stroke="${INK}" stroke-width="6" stroke-linejoin="round"/>`;
   const bangs = `<path d="M${-88 * s} ${-268 * s} Q${-62 * s} ${-296 * s} ${-32 * s} ${-270 * s} Q${0} ${-298 * s} ${32 * s} ${-270 * s} Q${62 * s} ${-296 * s} ${88 * s} ${-268 * s} L${84 * s} ${-306 * s} Q${40 * s} ${-338 * s} ${0} ${-338 * s} Q${-40 * s} ${-338 * s} ${-84 * s} ${-306 * s} Z" fill="#6e4a2f" stroke="${INK}" stroke-width="5" stroke-linejoin="round"/>`;
   const shirt = `<path d="M${-80 * s} ${-95 * s} Q0 ${-112 * s} ${80 * s} ${-95 * s} L${92 * s} ${-12 * s} Q${92 * s} ${0} ${78 * s} ${0} L${-78 * s} ${0} Q${-92 * s} ${0} ${-92 * s} ${-12 * s} Z" fill="#4a90d9" stroke="${INK}" stroke-width="6" stroke-linejoin="round"/>
