@@ -26,7 +26,7 @@ export const VILLAGE_STORY = [
   },
   {
     id: 4, title: "Điều kiêng của xóm", dur: 15, sky: "dusk",
-    sub: "Xóm tôi có một điều kiêng: khúc sông nào có người chết đuối, thì ba năm không ai được xuống tắm một mình.",
+    sub: "Xóm tôi kiêng: khúc sông có người chết đuối, ba năm không ai tắm một mình.",
     dialogue: "Nhớ lời má dặn: không tắm một mình, nghe chưa?",
     speaker: "Anh Hai",
   },
@@ -78,8 +78,9 @@ export function renderVillageFrame(t) {
   if (index === 0 || index === 5) {
     people = villagerSVG("Má", 300, 470, t) + villagerSVG("Anh Hai", 480, 470, t) + villagerSVG("Tôi", 620, 470, t) + villageDogSVG(780, 470, t);
   } else if (index === 1) {
-    // Má trên xuồng giữa rạch, hai anh em đứng bờ vẫy tay.
-    people = villagerSVG("Anh Hai", 220, 470, t) + villagerSVG("Tôi", 340, 470, t) + villageDogSVG(120, 470, t);
+    // Má trên xuồng giữa rạch, hai anh em đứng trên bờ vẫy tay.
+    // Bờ ở y≈385 (mép trên của rạch ở y=400), không đứng trong nước.
+    people = villagerSVG("Anh Hai", 220, 385, t) + villagerSVG("Tôi", 340, 385, t) + villageDogSVG(120, 385, t);
     extra = `<g transform="translate(${580 + Math.sin(t) * 6} 400)">
       <path d="M0 0 L170 0 L150 26 L20 26 Z" fill="#8a5a3b" stroke="#222" stroke-width="3"/>
       <g transform="translate(60 -120)">${villagerSVG("Má", 40, 120, t)}</g>
@@ -95,8 +96,12 @@ export function renderVillageFrame(t) {
     people = villagerSVG("Má", 300, 470, t) + villagerSVG("Anh Hai", 480, 470, t) + villagerSVG("Tôi", 620, 470, t) + villageDogSVG(780, 470, t);
   }
 
+  // Bong bóng thoại: cảnh 2 Má ở trên xuồng (đầu Má ở y≈271) nên đặt
+  // bong bóng phía trên Má, đuôi chỉ xuống gần nhãn tên của Má.
   const speakerX = scene.speaker === "Má" ? 300 : scene.speaker === "Anh Hai" ? 480 : 620;
-  const speech = index === 1 ? "" : speechSVG(scene.dialogue, Math.min(Math.max(speakerX, 200), 760), 150, 360);
+  const speech = index === 1
+    ? speechSVG(scene.dialogue, 660, 160, 340)
+    : speechSVG(scene.dialogue, Math.min(Math.max(speakerX, 200), 760), 150, 360);
 
   return `
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" width="960" height="540" role="img" aria-label="Chuyện làng quê: ${scene.title}">
@@ -115,9 +120,9 @@ export function renderVillageFrame(t) {
   ${extra}
   ${people}
   ${speech}
-  <rect x="0" y="452" width="960" height="20" fill="#000" opacity="0.25"/>
-  <text x="20" y="470" font-size="15" fill="#fff">Cảnh ${scene.id}/6 — ${scene.title} • Chuyện Ma Đêm Khuya Radio</text>
-  ${subtitleBarSVG(scene.sub, 486)}
-  <text x="940" y="470" text-anchor="end" font-size="14" fill="#fff">${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, "0")} / 1:30</text>
+  <rect x="0" y="438" width="960" height="20" fill="#000" opacity="0.25"/>
+  <text x="20" y="456" font-size="15" fill="#fff">Cảnh ${scene.id}/6 — ${scene.title} • Chuyện Ma Đêm Khuya Radio</text>
+  ${subtitleBarSVG(scene.sub)}
+  <text x="940" y="456" text-anchor="end" font-size="14" fill="#fff">${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, "0")} / 1:30</text>
 </svg>`.trim();
 }

@@ -63,22 +63,30 @@ export function renderStoryFrame(t) {
   const { scene, index, progress, localT } = storySceneAt(t);
   const [skyTop, skyBot] = scene.sky;
   const walkX = 180 + progress * 420; // A đi từ trái sang phải
-  const dogX = walkX + 110 + Math.sin(t * 2) * 8;
-  const girlX = 620;
+  // Chân nhân vật phải chạm mặt đường/bờ, không lơ lửng giữa trời.
+  // innerCharacter cao ~363px, scale 0.62 -> cao ~225px, nên ty = feetY - 225.
+  // Cảnh sông (4-5): bờ ở y=400 (mép trên của sông); các cảnh còn lại: mặt đường y=470.
+  const isRiver = index === 3 || index === 4;
+  const feetY = isRiver ? 400 : 470;
+  const charY = feetY - 225;
+  const dogX = index >= 2 && index <= 4 ? walkX - 130 + Math.sin(t * 2) * 8 : walkX + 110 + Math.sin(t * 2) * 8;
+  const dogY = isRiver ? 374 : 470; // chân chó chạm bờ/đường (chân ở y+26)
+  const girlX = 770; // đứng riêng, cách A lúc tới nơi ~130px, không chồng lên A
   const bob = Math.sin(t * 6) * 3;
 
   // Nhân vật: dùng lại innerCharacter, thu nhỏ và đặt vào vị trí.
-  const boy = `<g transform="translate(${walkX - 150} ${-10 + bob}) scale(0.62)">${innerCharacter({ expression: index === 4 ? "cuoi-lon" : "vui", pose: progress < 0.9 ? "vay-tay" : "chi-tay", ...CHARACTERS.boy })}</g>`;
-  const girl = index >= 2
-    ? `<g transform="translate(${girlX - 150} ${-10 - bob}) scale(0.62)">${innerCharacter({ expression: index === 4 ? "cuoi-lon" : "vui", pose: "vay-tay", ...CHARACTERS.girl })}</g>`
+  const boy = `<g transform="translate(${walkX - 150} ${charY + bob}) scale(0.62)">${innerCharacter({ expression: index === 4 ? "cuoi-lon" : "vui", pose: progress < 0.9 ? "vay-tay" : "chi-tay", ...CHARACTERS.boy })}</g>`;
+  // Cô bé chỉ xuất hiện cảnh 3-5; cảnh 6 A về nhà một mình.
+  const girl = index >= 2 && index <= 4
+    ? `<g transform="translate(${girlX - 150} ${charY - bob}) scale(0.62)">${innerCharacter({ expression: index === 4 ? "cuoi-lon" : "vui", pose: "vay-tay", ...CHARACTERS.girl })}</g>`
     : "";
-  const dog = `<g transform="translate(0 0)">${dogSVG(dogX, 470, t)}</g>`;
+  const dog = `<g transform="translate(0 0)">${dogSVG(dogX, dogY, t)}</g>`;
 
   // Bối cảnh theo cảnh: nhà ở cảnh 1 và 6, sông ở cảnh 4-5, đường ở cảnh 2-3.
   let ground = `<rect x="0" y="430" width="960" height="110" fill="#8fce6e"/>`;
   let place = "";
   if (index === 0 || index === 5) place = houseSVG(80, 300) + treeSVG(700, 430, t);
-  else if (index === 3 || index === 4) place = riverSVG(t) + treeSVG(120, 400, t, 0.9);
+  else if (index === 3 || index === 4) place = riverSVG(t) + `<rect x="0" y="384" width="960" height="18" fill="#d9c48a"/>` + treeSVG(120, 400, t, 0.9);
   else place = treeSVG(180, 430, t) + treeSVG(760, 430, t + 2);
   if (index === 3 || index === 4) ground = "";
 
@@ -87,7 +95,9 @@ export function renderStoryFrame(t) {
     : "";
 
   const speakerX = scene.speaker === "Girl" ? girlX : walkX;
-  const speech = speechSVG(scene.dialogue, Math.min(Math.max(speakerX, 190), 770), 150);
+  // Bong bóng đặt ngay trên đầu người nói (đỉnh đầu ở y≈charY+48),
+  // đuôi chỉ xuống đầu, không lơ lửng trên cao như trước.
+  const speech = speechSVG(scene.dialogue, Math.min(Math.max(speakerX, 190), 770), charY + 30);
 
   return `
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" width="960" height="540" role="img" aria-label="Phim: ${scene.title}">

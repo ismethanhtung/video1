@@ -99,7 +99,9 @@ export function villageDogSVG(x, groundY, t = 0) {
 }
 
 // Phụ đề kiểu video kể chuyện: thanh đen dưới cùng, chữ trắng lớn.
-export function subtitleBarSVG(text, y = 492) {
+// Neo đáy thanh vào cuối khung (bottom = 540) để không bao giờ tràn
+// khỏi khung, dù phụ đề 1, 2 hay 3 dòng.
+export function subtitleBarSVG(text, bottom = 540) {
   if (!text) return "";
   const words = text.split(" ");
   const lines = []; let cur = "";
@@ -109,6 +111,7 @@ export function subtitleBarSVG(text, y = 492) {
   }
   if (cur.trim()) lines.push(cur.trim());
   const h = 14 + lines.length * 26;
+  const y = bottom - (h + 10);
   return `<g><rect x="0" y="${y}" width="960" height="${h + 10}" fill="#000000" opacity="0.88"/>
   ${lines.map((ln, i) => `<text x="480" y="${y + 28 + i * 26}" text-anchor="middle" font-size="21" font-weight="bold" fill="#ffffff">${ln}</text>`).join("")}</g>`;
 }
