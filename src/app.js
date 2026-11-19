@@ -2,6 +2,7 @@ import { renderCharacter, renderBattle, EXPRESSIONS, POSES, CHARACTERS } from ".
 import { renderStoryFrame, STORY, STORY_DURATION, storySceneAt } from "./story.js";
 import { renderVillageFrame, VILLAGE_STORY, VILLAGE_DURATION, villageSceneAt } from "./villageStory.js";
 import { renderDoraemonFrame, DORAEMON_STORY, DORAEMON_DURATION, doraemonSceneAt } from "./doraemonStory.js";
+import { renderDesertFrame, DESERT_STORY, DESERT_DURATION, desertSceneAt } from "./desertStory.js";
 import { sfx, setSoundEnabled, isSoundEnabled } from "./sound.js";
 
 // Timeline demo: 5 cảnh, tổng 16 giây.
@@ -37,6 +38,9 @@ const state = {
   doraemonPlaying: false,
   doraemonStartAt: 0,
   doraemonLastScene: -1,
+  desertPlaying: false,
+  desertStartAt: 0,
+  desertLastScene: -1,
 };
 
 const $ = (id) => document.getElementById(id);
@@ -92,6 +96,39 @@ function renderStory(t) {
 // ${scene.sub}`;
   document.querySelectorAll("[data-story-scene]").forEach(b =>
     b.classList.toggle("active", Number(b.dataset.storyScene) === index));
+}
+
+function renderDesert(t) {
+  stage.innerHTML = renderDesertFrame(t);
+  const { scene, index } = desertSceneAt(t);
+  $("stage-title").textContent = `🏜️ ${scene.title}`;
+  $("stage-badge").textContent = "SA MẠC KHÔNG SÔNG • 30 GIÂY";
+  $("story-sub").textContent = `“${scene.dialogue}” — ${scene.sub}`;
+  $("time-label").textContent = `Phim sa mạc: 0:${String(Math.floor(t)).padStart(2, "0")} / 0:30 — Cảnh ${index + 1}/3: ${scene.title}`;
+  codeView.textContent =
+`renderDesertFrame(${t.toFixed(1)})
+// Cảnh ${scene.id}/3: ${scene.title}
+// ${scene.sub}`;
+  document.querySelectorAll("[data-desert-scene]").forEach(b =>
+    b.classList.toggle("active", Number(b.dataset.desertScene) === index));
+}
+
+function desertTick() {
+  if (!state.desertPlaying) return;
+  const elapsed = (performance.now() - state.desertStartAt) / 1000;
+  if (elapsed >= DESERT_DURATION) {
+    state.desertPlaying = false;
+    $("desert-btn").textContent = "▶ Xem lại phim sa mạc 30s";
+    sfx.cheer();
+    return;
+  }
+  const { index } = desertSceneAt(elapsed);
+  if (index !== state.desertLastScene) {
+    state.desertLastScene = index;
+    if (index === 1) sfx.pop(); else if (index === 2) sfx.cheer(); else sfx.jump();
+  }
+  renderDesert(elapsed);
+  requestAnimationFrame(desertTick);
 }
 
 function renderDoraemon(t) {
@@ -220,8 +257,51 @@ function tick() {
   requestAnimationFrame(tick);
 }
 
+$("desert-btn").onclick = () => {
+  state.playing = false; state.storyPlaying = false; state.villagePlaying = false; state.doraemonPlaying = false; state.mode = "desert"; state.desertPlaying = true; state.desertLastScene = -1;
+  state.desertStartAt = performance.now();
+  $("desert-btn").textContent = "⏸ Đang chiếu phim sa mạc…";
+  $("story-btn").textContent = "🎬 Xem phim 60s: Đi câu cá";
+  $("village-btn").textContent = "🏡 Xem phim làng quê 90s";
+  $("doraemon-btn").textContent = "🤖 Xem phim Doraemon 90s";
+  requestAnimationFrame(desertTick);
+};
+$("export-desert").onclick = async () => {
+  const btn = $("export-desert");
+  btn.disabled = true; btn.textContent = "Đang ghi phim 30s… đừng tắt tab";
+  try {
+    const canvas = document.createElement("canvas");
+    canvas.width = 960; canvas.height = 540;
+    const ctx = canvas.getContext("2d");
+    const stream = canvas.captureStream(30);
+    const rec = new MediaRecorder(stream, { mimeType: "video/webm" });
+    const chunks = [];
+    rec.ondataavailable = (e) => chunks.push(e.data);
+    const done = new Promise((res) => (rec.onstop = res));
+    rec.start();
+    const t0 = performance.now();
+    const draw = () => {
+      const elapsed = (performance.now() - t0) / 1000;
+      if (elapsed >= DESERT_DURATION) { rec.stop(); return; }
+      const svg = renderDesertFrame(elapsed);
+      const img = new Image();
+      img.onload = () => { ctx.drawImage(img, 0, 0, 960, 540); requestAnimationFrame(draw); };
+      img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+    };
+    draw();
+    await done;
+    const blob = new Blob(chunks, { type: "video/webm" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob); a.download = "sa-mac-khong-song.webm"; a.click();
+    URL.revokeObjectURL(a.href);
+  } catch (err) {
+    alert("Trình duyệt này không hỗ trợ ghi video WebM. Hãy dùng Chrome mới nhất.");
+  } finally {
+    btn.disabled = false; btn.textContent = "⬇ Xuất phim sa mạc 30s (WebM)";
+  }
+};
 $("doraemon-btn").onclick = () => {
-  state.playing = false; state.storyPlaying = false; state.villagePlaying = false; state.mode = "doraemon"; state.doraemonPlaying = true; state.doraemonLastScene = -1;
+  state.playing = false; state.storyPlaying = false; state.villagePlaying = false; state.desertPlaying = false; state.mode = "doraemon"; state.doraemonPlaying = true; state.doraemonLastScene = -1;
   state.doraemonStartAt = performance.now();
   $("doraemon-btn").textContent = "⏸ Đang chiếu phim Doraemon…";
   $("story-btn").textContent = "🎬 Xem phim 60s: Đi câu cá";
@@ -263,7 +343,7 @@ $("export-doraemon").onclick = async () => {
   }
 };
 $("village-btn").onclick = () => {
-  state.playing = false; state.storyPlaying = false; state.doraemonPlaying = false; state.mode = "village"; state.villagePlaying = true; state.villageLastScene = -1;
+  state.playing = false; state.storyPlaying = false; state.doraemonPlaying = false; state.desertPlaying = false; state.mode = "village"; state.villagePlaying = true; state.villageLastScene = -1;
   state.villageStartAt = performance.now();
   $("village-btn").textContent = "⏸ Đang chiếu phim làng quê…";
   $("story-btn").textContent = "🎬 Xem phim 60s: Đi câu cá";
@@ -304,7 +384,7 @@ $("export-village").onclick = async () => {
   }
 };
 $("story-btn").onclick = () => {
-  state.playing = false; state.villagePlaying = false; state.doraemonPlaying = false; state.mode = "story"; state.storyPlaying = true; state.storyLastScene = -1;
+  state.playing = false; state.villagePlaying = false; state.doraemonPlaying = false; state.desertPlaying = false; state.mode = "story"; state.storyPlaying = true; state.storyLastScene = -1;
   state.storyStartAt = performance.now();
   $("story-btn").textContent = "⏸ Đang chiếu phim…";
   $("play-btn").textContent = "▶ Phát timeline 16s";
@@ -428,10 +508,20 @@ DORAEMON_STORY.forEach((sc, i) => {
   b.textContent = `Doraemon ${sc.id}: ${sc.title}`;
   b.dataset.doraemonScene = i;
   b.onclick = () => {
-    state.playing = false; state.storyPlaying = false; state.villagePlaying = false; state.doraemonPlaying = false; state.mode = "doraemon";
+    state.playing = false; state.storyPlaying = false; state.villagePlaying = false; state.doraemonPlaying = false; state.desertPlaying = false; state.mode = "doraemon";
     renderDoraemon(i * 15 + 1);
   };
   $("doraemon-scenes").appendChild(b);
+});
+DESERT_STORY.forEach((sc, i) => {
+  const b = document.createElement("button");
+  b.textContent = `Sa mạc ${sc.id}: ${sc.title}`;
+  b.dataset.desertScene = i;
+  b.onclick = () => {
+    state.playing = false; state.storyPlaying = false; state.villagePlaying = false; state.doraemonPlaying = false; state.desertPlaying = false; state.mode = "desert";
+    renderDesert(i * 10 + 1);
+  };
+  $("desert-scenes").appendChild(b);
 });
 buildButtons();
 STORY.forEach((sc, i) => {
