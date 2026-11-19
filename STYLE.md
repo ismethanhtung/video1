@@ -15,14 +15,18 @@ Phong cách của video Bilibili 画渣花小烙 (BV1TBx46pEwA). Skill đầy đ
 3. **Nền:** màu phẳng tràn khung (xanh đêm, nâu ấm, xanh nhạt, cam ấm) hoặc
    nền trắng + MỘT hình hữu cơ lớn (gối, vũng nước). Giấy kẻ ô chỉ dùng cho
    khung kiểu sơ đồ, không dùng cho khung cảm xúc.
-4. **Nhân vật:** đầu to : thân nhỏ ≈ 1:1. Tóc là khối lớn + 1–3 sợi rối.
-   Tay chân cụt, không ngón tay.
+4. **Nhân vật:** đầu to : thân nhỏ ≈ 1:1. **Cô gái:** tóc nâu DÀI hình
+   chuông (hẹp ở đỉnh, xòe rộng qua vai ±180, đáy sóng lượn), mái hòa vào
+   tóc chỉ viền đường lượn dưới, mặt trắng to tròn rx≈112, mắt vui là 2
+   cung ∪ dày có mi hất, miệng cười há to ruột đỏ sẫm + lưỡi hồng, 1 sợi
+   tóc cong ở đỉnh đầu. Tay chân cụt, không ngón tay.
 5. **Mắt là quan trọng nhất:** mắt là 2 vòng tròn trắng LỚN, đường kính ≈ 25%
    chiều rộng mặt, con ngươi nhỏ (bằng ~1/3 bán kính mắt), nhìn lệch hoặc
    nhìn xuống. Mí trên là đường cong ngang. Mệt/buồn thì thêm quầng thâm
    (vệt xám-nâu `#c9b8a8` dưới mắt).
 6. **Miệng rất nhỏ:** đường ngang, `^`, oval nhỏ, hoặc đường lượn sóng.
-   Chỉ khi hét mới mở miệng to.
+   Chỉ khi cười vui mới mở miệng TO (ruột đỏ sẫm `#9e3d2c` + lưỡi hồng
+   `#e87a6a`); chỉ khi hét mới mở miệng to không lưỡi.
 7. **Má hồng:** mảng oval mềm, không phải hàng chấm (chấm chỉ dùng cho nhân
    vật hạt nhỏ).
 8. **Dấu hiệu cảm xúc (không được thiếu):** nước mắt xanh chảy dài, vạch run
@@ -64,7 +68,8 @@ Phong cách của video Bilibili 画渣花小烙 (BV1TBx46pEwA). Skill đầy đ
 ## Ánh xạ vào code
 
 - `src/doodle.js`: `faceSVG` (mắt to, mí, quầng, miệng), `blushDots`/`blushOval`,
-  `girlSVG` (tóc + sợi rối), `blobCharSVG`, `cupSVG`, `tearSVG`,
+  `girlSVG` (tóc dài hình chuông + mái + sợi cong đỉnh đầu; opts `shirt`,
+  `hands`, `cup`), `blobCharSVG`, `cupSVG`, `tearSVG`,
   `trembleSVG`, `sweatSVG`, `titleTextSVG`, `colorBgSVG`, `warmBgSVG`,
   `doodleSub`.
 - `src/coffeeStory.js`: 30 cảnh video cà phê; các cảnh cảm xúc dùng dấu hiệu

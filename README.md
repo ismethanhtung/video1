@@ -17,7 +17,17 @@ Claude tự viết code để vẽ, người chỉ xem và chê.
 - **v6 — Phim ngắn "Sa mạc không sông" 30 giây:** đúng phong cách ảnh tham chiếu — trời xanh, mặt trời lớn, cồn cát lớp lớp, người đàn ông áo thobe trắng, khăn kẻ đỏ, dép đen, đào giếng tìm nước. 3 cảnh × 10 giây: đào giếng giữa sa mạc không thấy nước, nhà máy khử mặn bên bờ biển biến nước biển thành nước ngọt, nước ngọt theo ống tới mọi nhà trong thành phố. Code ở `src/desert.js` + `src/desertStory.js`.
 - **v7 — Tranh cà phê phong cách vẽ tay (ảnh tĩnh, chưa có chuyển động):** học theo video Bilibili của 画渣花小烙 — viền nâu đậm dày hơi lệch tay, màu phẳng dịu, nhân vật hạt tròn (mắt nửa nhắm, miệng ^, má hồng 3 chấm), cô gái tóc nâu dài áo xanh dẫn chuyện, nền giấy kẻ ô, khung viền dày, phụ đề chữ đậm viền trắng. 6 khung hình về cà phê: giới thiệu, ba loại hạt (Arabica thơm / Robusta đậm / Liberica lạ), quy trình hái–rang–xay–pha phin, ba món (đen đá / sữa đá / bạc xỉu), uống nhiều quá (mất ngủ, tim đập nhanh, run tay), kết. Code ở `src/doodle.js` + `src/coffeeStory.js` — bộ công cụ vẽ tay dùng chung để giữ đồng nhất phong cách cho các phim sau.
 - **v8 — Video cà phê 5 phút "Hành trình của hạt cà phê Bi":** 30 cảnh × 10 giây = 300 giây, mỗi cảnh 1 tranh tĩnh + 1 câu phụ đề kể chuyện, căn đúng thời gian. Bi sinh ra từ hoa trắng, quả chín xanh–vàng–đỏ, được hái, phơi nắng, gặp ba bạn Arabica/Robusta/Liberica, vào máy rang nổ bụp bụp, xay thành bột, pha phin / espresso / latte art / bạc xỉu / cà phê trứng / cold brew, rồi cà phê vỉa hè, ngồi bệt, quán cóc–quán sang, cà phê thế giới, đêm deadline, caffeine vào não, 4 ly là vừa, uống nhiều quá, giờ vàng 9 giờ sáng, kết. Code ở `src/coffeeStory.js` (30 cảnh, `coffeeSceneAt`), đạo cụ mới trong `src/doodle.js` (cây, giỏ, máy rang, máy espresso, ghế nhựa, laptop, não, đồng hồ...). App có nút phát video 5 phút, 30 nút chọn cảnh và nút xuất WebM.
-- **v9 — Skill phong cách vẽ tay 画渣:** đo mẫu từ 5 khung mới user gửi （睡不着啊 / 巧克力历史 / 痛 / 经期腹泻 / 死去的鸟儿尸体) rồi gói thành skill + docs + rule: mắt là 2 vòng tròn trắng LỚN (đường kính ≈ 25% mặt), con ngươi nhỏ, quầng thâm khi mệt/buồn, miệng rất nhỏ, má hồng mảng oval, tóc rối có sợi bay, chữ tiêu đề LỚN trắng viền nâu hơi nghiêng, dấu hiệu cảm xúc (nước mắt xanh, vạch run rẩy, mồ hôi). Skill ở `~/workspace/custom-skills/huazha_doodle_style/SKILL.md`, docs trong repo ở `STYLE.md`. Áp dụng vào `src/doodle.js` (`faceSVG` v2, `tearSVG`, `trembleSVG`, `sweatSVG`, `titleTextSVG`, `colorBgSVG`) và các cảnh cảm xúc (mở đầu có chữ CÀ PHÊ lớn, Bi tỉnh dậy mắt quầng, BỤP! BỤP! kiểu tiêu đề, deadline có nước mắt + mồ hôi + vạch run, uống nhiều quá có nước mắt + vạch run).
+- **v10 — Vẽ lại nhân vật cô gái y hệt ảnh gốc:** user gửi chân dung cô gái
+  (`..._17.46.24.png`, nền xanh tím, áo cam, tóc dài) và yêu cầu tập trung
+  vào nhân vật trước vì bản cũ "quá đơn sơ, không chỉn chu". Viết lại
+  `girlSVG` trong `src/doodle.js`: tóc nâu dài hình chuông (hẹp ở đỉnh,
+  xòe rộng qua vai, đáy sóng lượn), mái hòa vào tóc chỉ viền đường lượn
+  dưới, mặt trắng to tròn (rx 112), mắt vui là 2 cung ∪ dày có mi hất,
+  miệng cười há to ruột đỏ sẫm `#9e3d2c` + lưỡi hồng, 1 sợi tóc cong ở
+  đỉnh đầu, opts `shirt`/`hands`/`cup`. Chân dung đối chiếu render bằng
+  `~/workspace/.render-check/render_portrait.mjs` (nền `#5b5bd6` + chấm sao
+  + áo cam `#f5a623`), xem cạnh ảnh gốc rồi mới ship. Skill và `STYLE.md`
+  cập nhật theo quy tắc mới.
 - Panel "Code đang chạy" cập nhật theo tham số bạn chọn
 - Xuất video WebM (ghi theo thời gian thực 12s, dùng Chrome), tải SVG
 
